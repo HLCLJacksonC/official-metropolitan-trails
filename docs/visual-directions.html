@@ -1,0 +1,635 @@
+<meta charset="utf-8">
+<title>Yangshupu, Three Ways</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fraunces:opsz,wght@9..144,400..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Karla:wght@400;500;700&display=swap">
+<style>
+:root{
+  --paper:#F2F1EE; --paper2:#E8E6E1; --card:#FBFAF8;
+  --ink:#17181A; --ink2:#5C6067; --ink3:#8A8E96;
+  --rule:#D2CFC8; --rule2:#E2DFD9;
+  --accent:#2E4A7D;
+  --cjk:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei";
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#121316; --paper2:#1A1C20; --card:#191B1F;
+    --ink:#E9E8E4; --ink2:#9BA0A8; --ink3:#71767E;
+    --rule:#2E3238; --rule2:#24272C;
+    --accent:#93B2E4;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121316; --paper2:#1A1C20; --card:#191B1F;
+  --ink:#E9E8E4; --ink2:#9BA0A8; --ink3:#71767E;
+  --rule:#2E3238; --rule2:#24272C;
+  --accent:#93B2E4;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",var(--cjk),system-ui,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1220px;margin:0 auto;padding:0 28px}
+h1,h2,h3{text-wrap:balance;margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+
+/* ---------- shell chrome ---------- */
+.mast{padding:64px 0 30px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:36px;align-items:end}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+.mast h1{font-size:clamp(30px,4.4vw,46px);line-height:1.06;font-weight:600;letter-spacing:-.022em;margin-top:14px}
+.mast p{max-width:60ch;color:var(--ink2);margin:16px 0 0;font-size:15.5px}
+.spec{font-family:"IBM Plex Mono",monospace;font-size:11.5px;line-height:2;color:var(--ink2);border-left:1px solid var(--rule);padding-left:18px;white-space:nowrap}
+.spec b{color:var(--ink);font-weight:500}
+
+.jump{display:flex;flex-wrap:wrap;gap:8px;padding:26px 0 0;border-top:1px solid var(--rule);margin-top:34px}
+.jump a{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;text-decoration:none;color:var(--ink2);
+  border:1px solid var(--rule);border-radius:999px;padding:7px 15px;background:var(--card);transition:.15s}
+.jump a:hover{color:var(--ink);border-color:var(--ink3)}
+.jump a b{font-weight:600;color:var(--accent);margin-right:7px}
+
+/* ---------- direction section ---------- */
+.dir{padding:70px 0 0}
+.dir-head{display:grid;grid-template-columns:76px minmax(0,1fr);gap:24px;align-items:start;padding-bottom:26px}
+.dir-letter{font-family:"IBM Plex Mono",monospace;font-size:56px;line-height:.8;font-weight:400;color:var(--rule);letter-spacing:-.04em}
+.dir-head h2{font-size:27px;font-weight:600;letter-spacing:-.015em}
+.dir-head .sub{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);margin-bottom:9px}
+.notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:22px;border-top:1px solid var(--rule)}
+.notes div{padding:14px 20px 16px 0;border-right:1px solid var(--rule2)}
+.notes div:last-child{border-right:0}
+.notes dt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.notes dd{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink2);max-width:34ch}
+.board{border:1px solid var(--rule);border-radius:3px;overflow:hidden;overflow-x:auto}
+.caption{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink3);padding:11px 2px 0;letter-spacing:.03em}
+
+svg{display:block}
+.route{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.8s cubic-bezier(.22,.61,.36,1)}
+.in .route{stroke-dashoffset:0}
+@media (prefers-reduced-motion:reduce){.route{transition:none;stroke-dashoffset:0}}
+
+/* ---------- A: data poster ---------- */
+.d-a{background:#12766A;color:#EAF3EF;font-family:Archivo,var(--cjk),sans-serif;min-width:900px}
+.d-a .stage{display:grid;grid-template-columns:246px minmax(0,1fr);gap:0}
+.d-a .rail{padding:30px 26px 30px 30px;border-right:1px solid rgba(234,243,239,.22)}
+.d-a .rail h3{font-size:26px;line-height:1.04;font-weight:800;font-stretch:88%;letter-spacing:-.01em;color:#fff}
+.d-a .rail .zh{font-size:15px;font-weight:600;opacity:.72;margin-top:5px}
+.d-a .stat{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid rgba(234,243,239,.16)}
+.d-a .stat span{font-size:10px;font-stretch:70%;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.66}
+.d-a .stat b{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:#fff}
+.d-a .stat b i{font-style:normal;font-size:11px;font-weight:600;opacity:.6;margin-left:3px}
+.d-a .statwrap{margin-top:24px}
+.d-a .bars{margin-top:24px}
+.d-a .bar{display:grid;grid-template-columns:74px 1fr 18px;gap:8px;align-items:center;font-size:10px;font-stretch:70%;
+  font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 0}
+.d-a .bar u{text-decoration:none;height:7px;background:#0B1F1C;display:block;border-radius:1px}
+.d-a .bar em{font-style:normal;font-variant-numeric:tabular-nums;text-align:right;opacity:.7}
+.d-a .map{position:relative}
+.d-a .chips{display:flex;gap:6px;padding:14px 22px;border-top:1px solid rgba(234,243,239,.22);flex-wrap:wrap}
+.d-a .chip{font-size:10px;font-stretch:76%;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  border:1px solid rgba(234,243,239,.4);border-radius:999px;padding:5px 12px;color:#EAF3EF}
+.d-a .chip.on{background:#EAF3EF;color:#0B4740;border-color:#EAF3EF}
+.d-a .pincard{position:absolute;right:20px;bottom:20px;width:296px;background:#0B1F1C;padding:16px 17px 17px;border-radius:2px}
+.d-a .pincard .n{font-size:10px;font-stretch:70%;font-weight:700;letter-spacing:.16em;opacity:.55;text-transform:uppercase}
+.d-a .pincard h4{margin:6px 0 0;font-size:16px;font-weight:800;font-stretch:88%;color:#fff}
+.d-a .pincard p{margin:8px 0 0;font-size:12.5px;line-height:1.5;opacity:.78;font-stretch:96%}
+.d-a .pincard .tg{display:inline-block;margin-top:11px;background:#EAF3EF;color:#0B1F1C;font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:1px}
+
+/* ---------- B: illustrated ---------- */
+.d-b{background:#EFE7D8;color:#22303A;font-family:Karla,var(--cjk),sans-serif;min-width:900px}
+.d-b .strip{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;padding:26px 26px 22px;position:relative}
+.d-b .strip h3{grid-column:1/-1;font-family:Fraunces,var(--cjk),serif;font-variation-settings:"opsz" 96,"wght" 700;
+  font-size:31px;line-height:1.08;color:#24493C;margin-bottom:4px}
+.d-b .strip .lede{grid-column:1/-1;max-width:64ch;font-size:14px;color:#4A5A58;margin-bottom:20px}
+.d-b .st{padding:0 14px 0 0}
+.d-b .st .num{width:21px;height:21px;border-radius:50%;border:1.4px solid #D2552E;color:#D2552E;font-size:11px;
+  font-weight:700;display:grid;place-items:center;margin-bottom:9px}
+.d-b .st h4{font-family:Fraunces,var(--cjk),serif;font-variation-settings:"opsz" 20,"wght" 600;font-size:14.5px;line-height:1.2;color:#24493C}
+.d-b .st .zh{font-size:12px;color:#7C7461;margin-top:2px}
+.d-b .st p{font-size:11.5px;line-height:1.5;color:#5C6A64;margin:7px 0 0}
+.d-b .mapwrap{background:#E5DECC;border-top:1.5px solid #CFC5AC}
+.d-b .legend{position:absolute;left:26px;top:26px;background:#F6F1E5;border:1.2px solid #CFC5AC;border-radius:2px;padding:13px 15px;width:196px}
+.d-b .legend b{font-family:Fraunces,serif;font-variation-settings:"opsz" 14,"wght" 700;font-size:11px;letter-spacing:.09em;
+  text-transform:uppercase;color:#24493C;display:block;margin-bottom:9px}
+.d-b .legend div{display:flex;align-items:center;gap:8px;font-size:11.5px;color:#4A5A58;padding:2.5px 0}
+.d-b .legend i{width:22px;height:2px;background:#24493C;display:block;flex:none}
+.d-b .legend i.d{background:none;border-top:2px dashed #D2552E;height:0}
+.d-b .legend i.p{background:#B9C9A9;height:11px;border-radius:2px}
+.d-b .legend i.w{background:#8FB0BE;height:9px;border-radius:2px}
+.d-b .narr{display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;padding:24px 26px 28px;border-top:1.5px solid #CFC5AC;align-items:start}
+.d-b .narr h4{font-family:Fraunces,var(--cjk),serif;font-variation-settings:"opsz" 40,"wght" 700;font-size:22px;color:#24493C;line-height:1.15}
+.d-b .narr p{font-size:14.5px;line-height:1.65;color:#3F4E4A;max-width:62ch;margin:8px 0 0}
+.d-b .narr .tg{display:inline-block;margin-top:12px;font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:#D2552E;border:1.2px solid #D2552E;border-radius:999px;padding:3px 11px}
+
+/* ---------- C: editorial diagram ---------- */
+.d-c{background:#F2F0EC;color:#0B0B0B;font-family:"Courier Prime",var(--cjk),monospace;min-width:900px}
+.d-c .top{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:26px;padding:24px 26px 18px;align-items:start}
+.d-c h3{font-size:23px;font-weight:700;line-height:1.15;text-transform:uppercase;letter-spacing:-.01em}
+.d-c .zh{font-size:15px;margin-top:4px}
+.d-c .meta{font-size:11.5px;line-height:1.9;border-left:2px solid #0B0B0B;padding-left:14px}
+.d-c .meta b{background:#E63419;color:#F2F0EC;padding:0 5px;font-weight:700}
+.d-c .filters{display:flex;gap:0;border-top:2px solid #0B0B0B;border-bottom:2px solid #0B0B0B;margin:0 26px}
+.d-c .filters button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  background:none;border:0;border-right:1px solid #0B0B0B;padding:9px 15px;color:#0B0B0B;cursor:pointer}
+.d-c .filters button[aria-pressed="true"]{background:#E63419;color:#F2F0EC}
+.d-c .filters button:last-child{border-right:0;margin-left:auto;border-left:1px solid #0B0B0B}
+.d-c .foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:2px solid #0B0B0B}
+.d-c .foot > div{padding:20px 26px 24px}
+.d-c .foot > div:first-child{border-right:1px solid #0B0B0B}
+.d-c .foot .n{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.d-c .foot h4{font-size:16px;font-weight:700;margin:7px 0 0;text-transform:uppercase}
+.d-c .foot p{font-size:13px;line-height:1.62;margin:9px 0 0;max-width:56ch}
+.d-c .stamp{display:inline-block;margin-top:12px;border:2px solid #E63419;color:#E63419;font-size:11px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;padding:3px 9px;transform:rotate(-1.6deg)}
+
+/* ---------- verdict ---------- */
+.verdict{margin:82px 0 90px;border-top:1px solid var(--rule);padding-top:34px;display:grid;grid-template-columns:200px minmax(0,1fr);gap:36px}
+.verdict h2{font-size:23px;font-weight:600;letter-spacing:-.015em}
+.verdict p{color:var(--ink2);max-width:66ch;margin:0 0 15px}
+.verdict p:last-child{margin-bottom:0}
+.verdict strong{color:var(--ink);font-weight:600}
+.verdict .pick{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:16px 18px;margin:20px 0;
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.95;color:var(--ink2)}
+.verdict .pick b{color:var(--ink);font-weight:500}
+@media (max-width:900px){
+  .mast,.verdict{grid-template-columns:1fr}
+  .spec{border-left:0;border-top:1px solid var(--rule);padding:16px 0 0}
+  .notes{grid-template-columns:1fr}
+  .notes div{border-right:0;border-bottom:1px solid var(--rule2)}
+  .dir-head{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="eyebrow">Metropolitan Trails · Shanghai · visual direction review</div>
+      <h1>Three ways to draw the same walk</h1>
+      <p>One trail, rendered three times, so a direction can be picked before the map and the entry
+         forms get built. Same six stops, same route geometry, same field notes — only the visual
+         system changes. Each board also shows the parts that have to survive contact with the app:
+         a theme filter, a stop label, and one pin opened.</p>
+    </div>
+    <div class="spec">
+      <b>Trail</b>&nbsp; 杨树浦路 · Yangshupu Rd<br>
+      <b>Theme</b>&nbsp; industrial_zone<br>
+      <b>Stops</b>&nbsp; 6&nbsp;·&nbsp;5.4 km&nbsp;·&nbsp;2 h 10 m<br>
+      <b>Data</b>&nbsp; sample, not field-verified<br>
+      <b>Date</b>&nbsp; 2026-09-02
+    </div>
+  </header>
+  <nav class="jump" aria-label="Directions">
+    <a href="#a"><b>A</b> Data-poster</a>
+    <a href="#b"><b>B</b> Illustrated infographic</a>
+    <a href="#c"><b>C</b> Editorial diagram</a>
+    <a href="#verdict"><b>→</b> Recommendation</a>
+  </nav>
+
+  <!-- ============ A ============ -->
+  <section class="dir" id="a">
+    <div class="dir-head">
+      <div class="dir-letter">A</div>
+      <div>
+        <div class="sub">Direction A</div>
+        <h2>Data-poster</h2>
+        <div class="notes">
+          <div><dt>Reads as</dt><dd>A record of a walk that was measured. Flat saturated ground, the city reduced to a ghost grid, one route that refuses to be missed.</dd></div>
+          <div><dt>Good for</dt><dd>The map view and any cross-trail comparison — six of these side by side stay legible, and the stats give each walk an identity.</dd></div>
+          <div><dt>Strains at</dt><dd>Photographs and long reflections. The poster wants numbers; the project's substance is text and images.</dd></div>
+        </div>
+      </div>
+    </div>
+    <div class="board"><div class="d-a" id="board-a"></div></div>
+    <div class="caption">A · flat ground, ghost grid, single route. Stats readout borrowed from printed running-route posters.</div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section class="dir" id="b">
+    <div class="dir-head">
+      <div class="dir-letter">B</div>
+      <div>
+        <div class="sub">Direction B</div>
+        <h2>Illustrated infographic</h2>
+        <div class="notes">
+          <div><dt>Reads as</dt><dd>A municipal interpretive panel — the sign at the trailhead. Drawn landmarks, numbered stops, a legend that explains its own vocabulary.</dd></div>
+          <div><dt>Good for</dt><dd>The narrative view. The numbered strip <em>is</em> requirement 5, already designed, and each stop gets room for a picture and a paragraph.</dd></div>
+          <div><dt>Strains at</dt><dd>Contributor speed. Every new stop wants an illustration nobody has time to draw, and the warmth softens content that shouldn't be softened.</dd></div>
+        </div>
+      </div>
+    </div>
+    <div class="board"><div class="d-b" id="board-b"></div></div>
+    <div class="caption">B · drawn landmarks and a numbered stop strip. Icons here are line-drawn placeholders, not the finished hand.</div>
+  </section>
+
+  <!-- ============ C ============ -->
+  <section class="dir" id="c">
+    <div class="dir-head">
+      <div class="dir-letter">C</div>
+      <div>
+        <div class="sub">Direction C</div>
+        <h2>Editorial diagram</h2>
+        <div class="notes">
+          <div><dt>Reads as</dt><dd>Reportage. Halftone, three colours, typewriter labels on leader lines, and a cross that marks where the route stops being a choice.</dd></div>
+          <div><dt>Good for</dt><dd>The argument. It is the only direction with a way to draw <em>friction</em> — the detour, the gate, the fence — which is what the project is actually recording.</dd></div>
+          <div><dt>Strains at</dt><dd>Being a plan. It naturally becomes an elevation, as below; a top-down map in this language needs a separate solution.</dd></div>
+        </div>
+      </div>
+    </div>
+    <div class="board"><div class="d-c" id="board-c"></div></div>
+    <div class="caption">C · drawn as a section along the river rather than a plan — the waterfront read at eye level, west to east.</div>
+  </section>
+
+  <!-- ============ verdict ============ -->
+  <section class="verdict" id="verdict">
+    <h2>Recommendation</h2>
+    <div>
+      <p>Don't pick one. These three aren't competing styles for the same screen — they're each strongest
+         at a different one of the six requirements, and the project has three distinct surfaces to build.</p>
+      <div class="pick">
+        <b>Map view + filters</b> ····· A, at lower saturation<br>
+        <b>Trail narrative view</b> ··· B's numbered strip, C's typography<br>
+        <b>Pin detail</b> ············ C<br>
+        <b>House palette</b> ········· C
+      </div>
+      <p><strong>C carries the identity.</strong> It's the only one of the three whose visual language has a
+         word for obstruction. The waterworks detour at stop 2 is the clearest finding on this whole walk —
+         a promenade that lifts you onto a bridge so you pass the 1883 building without ever standing next to it —
+         and A renders that as a wiggle in a line while C marks it. For a project whose premise is that the map
+         smooths over what the body notices, the direction that can draw the friction is the direction that agrees
+         with the research.</p>
+      <p><strong>B's structure survives, its warmth doesn't.</strong> Take the numbered stop strip and the
+         legend-that-teaches-its-own-notation straight into the narrative view. Leave the rag paper and the
+         drawn landmarks: an interpretive-panel look tells the reader the city has already been explained to them,
+         which is the opposite of the claim.</p>
+      <p><strong>A becomes the index, not the identity.</strong> Drop the saturation by about half and it's a good
+         all-trails map — the stats block gives each walk a face at small size, and it is the only direction that
+         stays readable with eight routes on one screen. It should look like C's quieter sibling, not its rival.</p>
+      <p>The lowest-effort path: build in C's palette and type, use the B strip for the story view, and treat A as
+         a display mode of the same map rather than a second design system.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ── one trail, three renderers ───────────────────────────────────────────── */
+const TAGS = {
+  comfortable:{zh:'舒适',en:'Comfortable'}, inconvenient:{zh:'不便',en:'Inconvenient'},
+  oppressive:{zh:'压迫',en:'Oppressive'},  safe:{zh:'安全',en:'Safe'},
+  nostalgic:{zh:'怀旧',en:'Nostalgic'}
+};
+
+const STOPS = [
+  { n:1, zh:'秦皇岛路码头', en:'Qinhuangdao Rd Wharf', yr:'1930s', tag:'comfortable', km:'0.0',
+    x:75,  y:425, la:{dx:16,dy:5,a:'start'},   ex:70,  ey:444, lc:{dx:34,dy:-64,a:'start'},
+    short:'The ferry pier. Two yuan, twelve minutes, and the only unrailed edge on the walk.',
+    text:'The ferry still runs every twelve minutes and costs two yuan. On the deck nobody looks at the skyline — they look at their phones, or at the water. This pier is the only place on the whole route where you can stand still at the river’s edge with nothing between you and it.' },
+  { n:2, zh:'杨树浦水厂', en:'Yangshupu Waterworks', yr:'1883', tag:'inconvenient', km:'0.9',
+    x:250, y:398, la:{dx:0,dy:-18,a:'middle'}, ex:350, ey:380, lc:{dx:-30,dy:-96,a:'end'},
+    short:'Still operating, so the promenade is lifted onto a bridge over the river.',
+    text:'The waterworks has drawn from the Huangpu since 1883 and it is still working, so the promenade cannot cross it. Instead you are lifted onto a 550-metre steel walkway hung out over the water, which puts a fence and eight metres of air between you and the castellated brick you came to look at. You pass the building without ever being beside it.' },
+  { n:3, zh:'杨树浦发电厂灰仓', en:'Power Plant Ash Silo', yr:'1913', tag:'oppressive', km:'2.1',
+    x:505, y:345, la:{dx:0,dy:-18,a:'middle'}, ex:570, ey:348, lc:{dx:0,dy:-78,a:'middle'},
+    short:'Eighty years of coal ash, now an art space. The echo comes back late.',
+    text:'Coal ash was stored here for eighty years. The concrete cylinders are an art space now, with a café on the roof; the walls were never painted and still smell of cement dust when it rains. Inside the silo your own footsteps come back at you about half a second late.' },
+  { n:4, zh:'毛麻仓库', en:'Cotton & Hemp Warehouse', yr:'1920', tag:'safe', km:'2.8',
+    x:620, y:315, la:{dx:14,dy:-12,a:'start'}, ex:690, ey:436, lc:{dx:-18,dy:-56,a:'end'},
+    short:'New paving, new lighting, a guard at each end, no shade, nobody sitting.',
+    text:'New paving, new lighting, a security guard at each end and no shade anywhere. At three in the afternoon this is the safest and least occupied stretch of the entire route: twelve people in twenty minutes, nine of them walking through, none of them sitting down.' },
+  { n:5, zh:'定海桥', en:'Dinghaiqiao', yr:'1920s–', tag:'nostalgic', km:'3.6',
+    x:660, y:255, la:{dx:0,dy:-22,a:'middle'}, ex:780, ey:470, lc:{dx:0,dy:50,a:'middle'},
+    short:'Two blocks inland the promenade’s vocabulary runs out.',
+    text:'Two blocks inland the promenade’s vocabulary stops. Shops face the street, laundry crosses the lane, the ground floor is doing five jobs at once. This is where the people who serviced the mills lived, and it is the only place on the route where anyone asked us what we were doing.' },
+  { n:6, zh:'复兴岛', en:'Fuxing Island', yr:'1920s', tag:'oppressive', km:'5.4',
+    x:905, y:188, la:{dx:-14,dy:5,a:'end'},    ex:930, ey:410, lc:{dx:0,dy:-70,a:'middle'},
+    short:'The gate is open, but there is a list of what may not be photographed.',
+    text:'The island is state land and mostly closed. The gate stands open, but there is a guard post beside it and a sign listing what may not be photographed. We walked eight hundred metres in and found nowhere to sit down.' }
+];
+
+const ROUTE_PLAN = 'M75,425 L200,406 L250,398 L302,449 L398,437 L468,363 L505,345 L620,315 L660,255 L742,266 L830,232 L905,188';
+const SHORE      = 'M-20,458 C160,433 300,428 380,400 C470,368 560,348 660,318 C775,282 862,228 1020,132';
+const ROUTE_ELEV = 'M70,444 L200,440 L300,398 L350,380 L410,398 L470,418 L512,404 L545,332 L570,348 L620,372 L660,414 L690,436 L742,440 L780,470 L845,442 L890,414 L930,410';
+
+const rand = (s => () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648)(11);
+
+/* ── A · data-poster ──────────────────────────────────────────────────────── */
+function boardA(){
+  let ghost = '', arterial = '';
+  for (let i = -5; i < 17; i++){
+    const y = i * 40 + rand() * 16;
+    ghost += `<path d="M-30,${y+128} C 260,${y+100} 520,${y+72} 1030,${y-14}"/>`;
+  }
+  for (let i = 0; i < 27; i++){
+    const x = i * 44 + rand() * 24 - 30;
+    ghost += `<line x1="${x.toFixed(1)}" y1="-20" x2="${(x-168).toFixed(1)}" y2="600"/>`;
+  }
+  [0,6,13,21].forEach(i => {
+    const y = i * 40 + 18;
+    arterial += `<path d="M-30,${y+128} C 260,${y+100} 520,${y+72} 1030,${y-14}"/>`;
+  });
+
+  const counts = {};
+  STOPS.forEach(s => counts[s.tag] = (counts[s.tag] || 0) + 1);
+  const bars = Object.keys(TAGS).map(k => {
+    const c = counts[k] || 0;
+    return `<div class="bar"><span>${TAGS[k].en}</span><u style="width:${(c/2*100).toFixed(0)}%"></u><em>${c}</em></div>`;
+  }).join('');
+
+  const stat = (l, v, u) => `<div class="stat"><span>${l}</span><b>${v}${u?`<i>${u}</i>`:''}</b></div>`;
+  const pin = STOPS[1];
+
+  document.getElementById('board-a').innerHTML = `
+  <div class="stage">
+    <div class="rail">
+      <h3>Yangshupu Rd<br>Waterworks to<br>Powerhouse</h3>
+      <div class="zh">杨树浦路：水厂到电厂</div>
+      <div class="statwrap">
+        ${stat('Distance','5.4','km')}${stat('Stops','6')}${stat('On foot','2:10','h')}
+        ${stat('Pace','2.5','km/h')}${stat('Photographs','23')}${stat('Walked','19.08.26')}
+      </div>
+      <div class="bars">
+        <div class="bar" style="opacity:.6;margin-bottom:6px"><span>How it felt</span><u style="background:none"></u><em></em></div>
+        ${bars}
+      </div>
+    </div>
+    <div class="map">
+      <svg viewBox="0 0 1000 560" width="100%" role="img"
+           aria-label="Plan of the Yangshupu Road trail: six stops along the north bank of the Huangpu.">
+        <defs><clipPath id="aClip"><rect width="1000" height="560"/></clipPath></defs>
+        <g clip-path="url(#aClip)">
+          <rect width="1000" height="560" fill="#12766A"/>
+          <g stroke="#EAF3EF" stroke-opacity=".14" stroke-width="1" fill="none">${ghost}</g>
+          <g stroke="#EAF3EF" stroke-opacity=".3" stroke-width="2" fill="none">${arterial}</g>
+          <path d="${SHORE} L1020,600 L-20,600 Z" fill="#0A3F39"/>
+          <path d="${SHORE}" fill="none" stroke="#EAF3EF" stroke-opacity=".45" stroke-width="1.5"/>
+          <text x="820" y="470" fill="#EAF3EF" fill-opacity=".42" font-size="15" font-weight="700"
+                font-stretch="70%" letter-spacing="4">黄浦江 HUANGPU</text>
+          <path class="route" d="${ROUTE_PLAN}" pathLength="1" fill="none" stroke="#0B1F1C"
+                stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          ${STOPS.map(s => `
+            <circle cx="${s.x}" cy="${s.y}" r="10" fill="#EAF3EF"/>
+            <text x="${s.x}" y="${s.y+4}" text-anchor="middle" fill="#0B4740" font-size="12"
+                  font-weight="800">${s.n}</text>
+            <text x="${s.x+s.la.dx}" y="${s.y+s.la.dy}" text-anchor="${s.la.a}" fill="#fff" font-size="12.5"
+                  font-weight="700" font-stretch="76%" letter-spacing="1.4"
+                  style="text-transform:uppercase">${s.en.toUpperCase()}</text>`).join('')}
+        </g>
+      </svg>
+      <div class="pincard">
+        <div class="n">Stop 02 · 0.9 km · Y. Zhou</div>
+        <h4>${pin.en}<br><span style="font-weight:600;opacity:.7;font-size:13px">${pin.zh} · ${pin.yr}</span></h4>
+        <p>${pin.short}</p>
+        <span class="tg">${TAGS[pin.tag].zh} ${TAGS[pin.tag].en}</span>
+      </div>
+    </div>
+  </div>
+  <div class="chips">
+    <span class="chip on">All trails</span><span class="chip">Colonial history</span>
+    <span class="chip on">Industrial zone</span><span class="chip">Urban village</span>
+    <span class="chip">Gender &amp; public space</span>
+  </div>`;
+}
+
+/* ── B · illustrated infographic ──────────────────────────────────────────── */
+const ICONS = {
+  1:'M8,27 h24 M12,27 v-9 M28,27 v-9 M12,18 h16 M20,18 v-8 M20,10 l7,3 -7,3 M5,33 q4,-3 8,0 t8,0 t8,0 t8,0',
+  2:'M12,32 v-17 h16 v17 M12,15 v-4 h3.5 v4 M19,15 v-4 h3.5 v4 M26,15 v-4 h2 v4 M16,32 v-9 h8 v9 M9,32 h22 M16,20 h8',
+  3:'M9,32 v-13 a5.5,4.5 0 0 1 11,0 v13 M22,32 v-9 a4,3.5 0 0 1 8,0 v9 M7,32 h27 M30,20 v-9 M26,25 h4',
+  4:'M8,32 v-12 l12,-7 12,7 v12 M7,32 h27 M13,32 v-8 h5 v8 M22,23 h6 v5 h-6z M34,12 h-8 M26,12 v6 M26,18 l-3,3',
+  5:'M6,32 h29 M8,32 v-9 l5,-4 5,4 v9 M20,32 v-11 l5,-4 5,4 v11 M10,32 v-5 h4 v5 M24,32 v-5 h4 v5 M6,15 q7,3.5 14,0 M9,15 v3 M14,16 v3',
+  6:'M9,32 v-19 M31,32 v-19 M9,17 h22 M7,32 h27 M14,32 v-12 M20,32 v-12 M26,32 v-12 M13,11 h4 M23,11 h4'
+};
+const SHORE_PTS = [[-20,458],[190,428],[380,400],[520,358],[660,318],[800,262],[1020,132]];
+function shoreY(x){
+  for (let i = 1; i < SHORE_PTS.length; i++){
+    const [x0,y0] = SHORE_PTS[i-1], [x1,y1] = SHORE_PTS[i];
+    if (x <= x1) return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+  }
+  return 132;
+}
+const LB = { 1:[10,'start'], 5:[26,'start'], 6:[-8,'end'] };
+function boardB(){
+  let blocks = '';
+  for (let gx = 10; gx < 990; gx += 46){
+    for (let gy = 10; gy < 460; gy += 40){
+      const w = 26 + rand() * 14, h = 20 + rand() * 12;
+      if (gy + h < shoreY(gx + w) - 14 && rand() > .22)
+        blocks += `<rect x="${(gx+rand()*8).toFixed(0)}" y="${gy.toFixed(0)}" width="${w.toFixed(0)}" height="${h.toFixed(0)}" rx="1.5"/>`;
+    }
+  }
+  const parks = ['M60,300 q60,-40 130,-14 q54,20 30,66 q-30,58 -104,34 q-70,-22 -56,-86z',
+                 'M420,150 q80,-34 132,4 q40,29 4,66 q-46,47 -110,20 q-58,-25 -26,-90z',
+                 'M690,90 q70,-26 108,10 q30,29 -6,58 q-44,35 -92,8 q-40,-23 -10,-76z'];
+  const strip = STOPS.map(s => `
+    <div class="st"><div class="num">${s.n}</div>
+      <h4>${s.en}</h4><div class="zh">${s.zh} · ${s.yr}</div><p>${s.short}</p></div>`).join('');
+  const narr = STOPS[4];
+
+  document.getElementById('board-b').innerHTML = `
+  <div class="strip">
+    <h3>Landmarks on this trail <span style="color:#D2552E">— 5.4 km on foot, about 2 h 10 m</span></h3>
+    <div class="lede">Six stops along the north bank of the Huangpu, west to east, following the promenade
+      opened in 2019 over the sites of Shanghai’s first waterworks, first power station and first shipyard.
+      Walked 19 August 2026 by Y. Zhou and K. Lin.</div>
+    ${strip}
+  </div>
+  <div class="mapwrap" style="position:relative">
+    <svg viewBox="0 0 1000 560" width="100%" role="img"
+         aria-label="Illustrated plan of the trail with drawn landmarks at each of the six stops.">
+      <rect width="1000" height="560" fill="#E5DECC"/>
+      <g fill="#B9C9A9" fill-opacity=".8">${parks.map(d=>`<path d="${d}"/>`).join('')}</g>
+      <g fill="#DED5BF" stroke="#CFC5AC" stroke-width="1">${blocks}</g>
+      <path d="${SHORE} L1020,600 L-20,600 Z" fill="#8FB0BE"/>
+      <path d="${SHORE}" fill="none" stroke="#F6F1E5" stroke-width="2"/>
+      <g stroke="#F6F1E5" stroke-width="4.5" fill="none" stroke-linecap="round">
+        <path d="M-10,392 C200,372 420,318 1010,120"/>
+        <path d="M120,-10 L20,540"/><path d="M470,-10 L360,540"/><path d="M800,-10 L690,540"/>
+      </g>
+      <text transform="translate(806,486) rotate(-19)" fill="#5C7C8A" font-size="17"
+            font-family="Fraunces, serif" font-style="italic">黄浦江 Huangpu</text>
+      <text transform="translate(96,352) rotate(-19)" fill="#7C7461" font-size="13"
+            font-family="Fraunces, serif" letter-spacing="2">杨树浦路 YANGSHUPU RD</text>
+      <mask id="bReveal"><path class="route" d="${ROUTE_PLAN}" pathLength="1" fill="none"
+            stroke="#fff" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/></mask>
+      <path mask="url(#bReveal)" d="${ROUTE_PLAN}" pathLength="1" fill="none" stroke="#D2552E"
+            stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+            style="stroke-dasharray:.006 .008"/>
+      ${STOPS.map(s => `
+        <g transform="translate(${s.x-20},${s.y-46}) rotate(${(rand()*3-1.5).toFixed(2)} 20 20)">
+          <circle cx="20" cy="20" r="19" fill="#F6F1E5" stroke="#CFC5AC" stroke-width="1.2"/>
+          <path d="${ICONS[s.n]}" fill="none" stroke="#24493C" stroke-width="1.6"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+        <circle cx="${s.x}" cy="${s.y}" r="9.5" fill="#D2552E"/>
+        <text x="${s.x}" y="${s.y+3.7}" text-anchor="middle" fill="#F6F1E5" font-size="11"
+              font-weight="700" font-family="Karla, sans-serif">${s.n}</text>
+        <text x="${s.x+(LB[s.n]?LB[s.n][0]:0)}" y="${s.y+26}" text-anchor="${LB[s.n]?LB[s.n][1]:'middle'}"
+              fill="#24493C" font-size="12.5" font-family="Fraunces, serif"
+              style="font-variation-settings:'opsz' 14,'wght' 600">${s.en}</text>`).join('')}
+    </svg>
+    <div class="legend">
+      <b>Legend</b>
+      <div><i></i> Promenade</div>
+      <div><i class="d"></i> Our route</div>
+      <div><i class="p"></i> Park &amp; planting</div>
+      <div><i class="w"></i> Huangpu River</div>
+      <div style="margin-top:7px;padding-top:8px;border-top:1px solid #CFC5AC">
+        <span style="width:22px;height:22px;border-radius:50%;background:#D2552E;color:#F6F1E5;font-size:11px;
+        font-weight:700;display:grid;place-items:center;flex:none">n</span> Numbered stop</div>
+    </div>
+  </div>
+  <div class="narr">
+    <div style="text-align:right">
+      <div style="font-family:Fraunces,serif;font-size:44px;line-height:1;color:#D2552E;
+           font-variation-settings:'opsz' 60,'wght' 700">${narr.n}</div>
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#7C7461;margin-top:4px">${narr.km} km</div>
+    </div>
+    <div>
+      <h4>${narr.en} <span style="font-size:16px;color:#7C7461">${narr.zh} · ${narr.yr}</span></h4>
+      <p>${narr.text}</p>
+      <span class="tg">${TAGS[narr.tag].zh} ${TAGS[narr.tag].en}</span>
+      <span class="tg" style="border-color:#7C7461;color:#7C7461">K. Lin · 19.08.26</span>
+    </div>
+  </div>`;
+}
+
+/* ── C · editorial diagram ────────────────────────────────────────────────── */
+const SKYLINE = 'M0,560 L0,478 L60,478 L60,446 L120,446 L120,432 L150,432 A62,52 0 0 1 274,432 '
+  + 'L300,432 L300,392 L312,392 L312,382 L326,382 L326,392 L340,392 L340,382 L354,382 L354,392 '
+  + 'L368,392 L368,382 L382,382 L382,392 L400,392 L400,420 L424,420 L426,180 L444,180 L446,420 '
+  + 'L470,420 L470,412 L512,412 L512,350 A30,26 0 0 1 572,350 L572,412 L580,412 L580,364 '
+  + 'A24,21 0 0 1 628,364 L628,412 L660,412 L660,438 L716,438 L716,300 L730,300 L730,268 '
+  + 'L820,268 L820,300 L834,300 L834,438 L880,438 L880,412 L940,412 L940,452 L1000,452 L1000,560 Z';
+
+const mw = (s, fs) => [...s].reduce((a,c) => a + (c.charCodeAt(0) > 0x2E80 ? 2 : 1), 0) * (fs * 0.6 + 0.65);
+function cbox(x, y, anchor, text, fs, mode){
+  const w = mw(text, fs) + 15, h = fs + 11;
+  const bx = anchor === 'end' ? x - w : anchor === 'middle' ? x - w/2 : x;
+  const bg = mode === 'red' ? '#E63419' : mode === 'black' ? '#0B0B0B' : '#F2F0EC';
+  const fg = mode === 'paper' ? '#0B0B0B' : '#F2F0EC';
+  const st = mode === 'paper' ? ' stroke="#0B0B0B" stroke-width="1.6"' : '';
+  return `<rect x="${bx.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${h}" fill="${bg}"${st}/>`
+       + `<text x="${(bx+7.5).toFixed(1)}" y="${y + h - Math.round(fs*.36)}" fill="${fg}" font-size="${fs}"`
+       + ` font-weight="700" letter-spacing=".6" font-family="'Courier Prime', monospace">${text}</text>`;
+}
+function xmark(x, y){
+  return `<g stroke-linecap="square"><path d="M${x-11},${y-11} L${x+11},${y+11} M${x+11},${y-11} L${x-11},${y+11}"
+    stroke="#F2F0EC" stroke-width="8.5"/><path d="M${x-11},${y-11} L${x+11},${y+11} M${x+11},${y-11} L${x-11},${y+11}"
+    stroke="#E63419" stroke-width="4.5"/></g>`;
+}
+
+function boardC(){
+  const marks = STOPS.map(s => {
+    const end = s.n === 1 || s.n === 6;
+    const shape = end
+      ? `<circle cx="${s.ex}" cy="${s.ey}" r="8.5" fill="#0B0B0B" stroke="#F2F0EC" stroke-width="2.4"/>
+         <path d="M${s.ex},${s.ey+8} L${s.ex},${s.ey+22}" stroke="#F2F0EC" stroke-width="4"/>
+         <path d="M${s.ex},${s.ey+8} L${s.ex},${s.ey+22}" stroke="#0B0B0B" stroke-width="2"/>`
+      : `<path d="M${s.ex},${s.ey-13} L${s.ex+12},${s.ey+8} L${s.ex-12},${s.ey+8} Z"
+           fill="#0B0B0B" stroke="#F2F0EC" stroke-width="2.4" stroke-linejoin="round"/>`;
+    const lx = s.ex + s.lc.dx, ly = s.ey + s.lc.dy, fs = 11.5;
+    const anchorY = s.lc.dy < 0 ? ly + fs + 11 : ly;
+    return `<g class="cmark" data-tag="${s.tag}">
+      <path d="M${s.ex},${s.ey} L${lx},${anchorY}" stroke="#0B0B0B" stroke-width="1.6"/>
+      ${shape}
+      ${cbox(lx, ly, s.lc.a, `${String(s.n).padStart(2,'0')} ${s.en.toUpperCase()}`, fs, 'red')}
+      <text x="${s.lc.a === 'start' ? lx + 2 : lx}" y="${ly - 6}" text-anchor="${s.lc.a}"
+            font-size="11" font-weight="700" fill="#0B0B0B" stroke="#F2F0EC" stroke-width="3.2"
+            paint-order="stroke" font-family="'Courier Prime', 'PingFang SC', monospace">${s.zh} ${s.yr}</text>
+    </g>`;
+  }).join('');
+
+  const pin = STOPS[1];
+  document.getElementById('board-c').innerHTML = `
+  <div class="top">
+    <div>
+      <h3>Yangshupu Road — Waterworks to Powerhouse</h3>
+      <div class="zh">杨树浦路：水厂到电厂 · 上海城市步道 03</div>
+    </div>
+    <div class="meta">
+      THEME <b>INDUSTRIAL ZONE</b><br>
+      WALKED 19.08.2026 · 5.4 KM · 2H10<br>
+      6 STOPS · 23 PHOTOGRAPHS<br>
+      Y. ZHOU &amp; K. LIN
+    </div>
+  </div>
+  <div class="filters">
+    <button type="button" data-f="comfortable" aria-pressed="false">舒适 Comfortable</button>
+    <button type="button" data-f="inconvenient" aria-pressed="false">不便 Inconvenient</button>
+    <button type="button" data-f="oppressive" aria-pressed="false">压迫 Oppressive</button>
+    <button type="button" data-f="safe" aria-pressed="false">安全 Safe</button>
+    <button type="button" data-f="nostalgic" aria-pressed="false">怀旧 Nostalgic</button>
+    <button type="button" data-f="story" aria-pressed="false">Read as story →</button>
+  </div>
+  <svg viewBox="0 0 1000 560" width="100%" role="img"
+       aria-label="Elevation of the Yangshupu waterfront read west to east, with the six stops labelled and two crosses marking where the route is obstructed.">
+    <defs>
+      <pattern id="ht" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="#E63419"/></pattern>
+      <pattern id="ht2" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" fill="#E63419"/></pattern>
+      <linearGradient id="fade" x1="0" y1="1" x2="0" y2="0">
+        <stop offset="0" stop-color="#000"/><stop offset=".55" stop-color="#0A0A0A"/><stop offset=".82" stop-color="#8C8C8C"/><stop offset="1" stop-color="#fff"/>
+      </linearGradient>
+      <mask id="fadeM"><rect width="1000" height="560" fill="url(#fade)"/></mask>
+      <clipPath id="sil"><path d="${SKYLINE}"/></clipPath>
+    </defs>
+    <rect width="1000" height="560" fill="#E63419"/>
+    <g clip-path="url(#sil)">
+      <rect width="1000" height="560" fill="#0B0B0B"/>
+      <rect width="1000" height="560" fill="url(#ht)"/>
+      <rect width="1000" height="560" fill="url(#ht2)" mask="url(#fadeM)"/>
+    </g>
+    <rect y="524" width="1000" height="36" fill="#F2F0EC"/>
+    <g stroke="#0B0B0B" stroke-width="1.4" stroke-linecap="round">
+      <path d="M40,538 h120 M200,538 h60 M300,546 h180 M520,538 h90 M660,546 h70 M840,538 h130"/>
+    </g>
+    ${cbox(30, 494, 'start', '黄浦江 HUANGPU RIVER', 11.5, 'black')}
+    ${cbox(990, 126, 'end', '杨浦大桥 YANGPU BRIDGE', 11.5, 'black')}
+    ${cbox(120, 190, 'middle', '煤气包 GASHOLDER', 11.5, 'black')}
+    <path d="M120,213 L212,382" stroke="#0B0B0B" stroke-width="1.6"/>
+    <path class="route" d="${ROUTE_ELEV}" pathLength="1" fill="none" stroke="#F2F0EC" stroke-width="7"
+          stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+    <path class="route" d="${ROUTE_ELEV}" pathLength="1" fill="none" stroke="#0B0B0B" stroke-width="3"
+          stroke-dasharray="9 8" stroke-linecap="butt"/>
+    ${marks}
+    ${xmark(415, 400)}${xmark(896, 414)}
+    ${cbox(60, 236, 'start', 'WHERE THE PROMENADE LEAVES THE BANK', 11.5, 'paper')}
+    <path d="M315,258 L404,391" stroke="#0B0B0B" stroke-width="1.6"/>
+    ${cbox(990, 478, 'end', 'NO PHOTOGRAPHY PAST THIS POINT', 11.5, 'paper')}
+    <path d="M900,478 L897,426" stroke="#0B0B0B" stroke-width="1.6"/>
+  </svg>
+  <div class="foot">
+    <div>
+      <div class="n">Stop 02 · 0.9 km · Y. Zhou · 19.08.26</div>
+      <h4>${pin.en} <span style="font-weight:400">${pin.zh}, ${pin.yr}</span></h4>
+      <p>${pin.text}</p>
+      <span class="stamp">${TAGS[pin.tag].zh} ${TAGS[pin.tag].en}</span>
+    </div>
+    <div>
+      <div class="n">Why this trail</div>
+      <h4>The promenade as an argument</h4>
+      <p>Five and a half kilometres of the East Bund, where Shanghai’s first waterworks, first power station
+         and first shipyard now sit inside one continuous public promenade completed in 2019. The route asks
+         a single question at every stop: what does the promenade let you approach, and what does it walk you past?</p>
+      <span class="stamp" style="border-color:#0B0B0B;color:#0B0B0B">Industrial zone</span>
+    </div>
+  </div>`;
+
+  const active = new Set();
+  document.querySelectorAll('.d-c .filters button').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.f === 'story') return;
+    const on = b.getAttribute('aria-pressed') === 'true';
+    b.setAttribute('aria-pressed', String(!on));
+    on ? active.delete(b.dataset.f) : active.add(b.dataset.f);
+    document.querySelectorAll('.d-c .cmark').forEach(g => {
+      g.style.opacity = (!active.size || active.has(g.dataset.tag)) ? '1' : '.18';
+    });
+  }));
+}
+
+boardA(); boardB(); boardC();
+
+const io = new IntersectionObserver((es) => es.forEach(e => {
+  if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold: .18 });
+document.querySelectorAll('.board').forEach(b => io.observe(b));
+</script>
