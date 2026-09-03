@@ -98,31 +98,35 @@ svg{display:block}
 /* ---------- B: night network ---------- */
 .d-b{background:#121212;color:#F2F0EC;font-family:Archivo,var(--cjk),sans-serif;min-width:900px}
 .d-b .map{position:relative}
-.d-b .title{position:absolute;right:30px;bottom:30px;text-align:right;max-width:400px}
-.d-b .title h3{font-size:46px;line-height:.92;font-weight:800;letter-spacing:-.035em;color:#EE2B8C}
-.d-b .title .zh{font-size:17px;font-weight:600;margin-top:11px;letter-spacing:.02em}
-.d-b .title .sub{font-size:12.5px;font-weight:500;opacity:.66;margin-top:6px;font-variant-numeric:tabular-nums}
-.d-b .pincard{position:absolute;left:28px;top:28px;width:302px;background:#121212;
+.d-b .topbar{display:flex;align-items:baseline;gap:0;padding:12px 26px;font-size:14px;font-weight:600;
+  letter-spacing:.055em;text-transform:uppercase;border-bottom:1px solid rgba(242,240,236,.22)}
+.d-b .topbar b{font-weight:800;color:#9EE86B;margin-right:.45em;letter-spacing:.03em}
+.d-b .pincard{position:absolute;left:26px;bottom:26px;width:300px;background:#121212;
   border:1px solid rgba(242,240,236,.3);padding:16px 17px 17px}
-.d-b .pincard .n{font-size:9.5px;font-weight:700;font-stretch:76%;letter-spacing:.16em;text-transform:uppercase;color:#EE2B8C}
+.d-b .pincard .n{font-size:9.5px;font-weight:700;font-stretch:76%;letter-spacing:.16em;text-transform:uppercase;color:#9EE86B}
 .d-b .pincard h4{margin:7px 0 0;font-size:17px;font-weight:800;letter-spacing:-.01em}
 .d-b .pincard .zh{font-size:12.5px;font-weight:500;opacity:.6;margin-top:2px}
 .d-b .pincard p{margin:9px 0 0;font-size:12.5px;line-height:1.52;opacity:.8}
-.d-b .pincard .tg{display:inline-block;margin-top:12px;background:#EE2B8C;color:#121212;font-size:10px;
+.d-b .pincard .tg{display:inline-block;margin-top:12px;background:#9EE86B;color:#121212;font-size:10px;
   font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px}
+.d-b .key{position:absolute;right:26px;bottom:26px;align-items:flex-end;display:flex;flex-direction:column;gap:7px}
+.d-b .key div{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:600;opacity:.55;text-shadow:0 0 7px #121212,0 0 3px #121212}
+.d-b .key div.on{opacity:1}
+.d-b .key i{width:22px;height:3px;background:rgba(242,240,236,.4);flex:none;border-radius:2px}
+.d-b .key div.on i{background:#9EE86B;height:4px}
 .d-b .bar{display:flex;align-items:center;gap:7px;padding:13px 26px;flex-wrap:wrap;
   border-top:1px solid rgba(242,240,236,.22)}
 .d-b .bar .lbl{font-size:9.5px;font-weight:700;font-stretch:74%;letter-spacing:.18em;text-transform:uppercase;
   opacity:.45;margin-right:5px}
 .d-b .chip{font-size:10.5px;font-weight:700;font-stretch:80%;letter-spacing:.1em;text-transform:uppercase;
   border:1px solid rgba(242,240,236,.3);border-radius:999px;padding:5px 12px}
-.d-b .chip.on{background:#EE2B8C;border-color:#EE2B8C;color:#121212}
+.d-b .chip.on{background:#9EE86B;border-color:#9EE86B;color:#121212}
 .d-b .facts{margin-left:auto;font-size:10.5px;font-weight:700;font-stretch:76%;letter-spacing:.13em;
   text-transform:uppercase;opacity:.6;font-variant-numeric:tabular-nums}
 .d-b .stops{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-top:1px solid rgba(242,240,236,.22)}
 .d-b .stops > div{padding:15px 17px 18px;border-right:1px solid rgba(242,240,236,.13)}
 .d-b .stops > div:last-child{border-right:0}
-.d-b .stops .n{font-size:11px;font-weight:800;color:#EE2B8C;letter-spacing:.12em}
+.d-b .stops .n{font-size:11px;font-weight:800;color:#9EE86B;letter-spacing:.12em}
 .d-b .stops h4{font-size:13.5px;font-weight:700;margin:7px 0 0;line-height:1.18;letter-spacing:-.005em}
 .d-b .stops .zh{font-size:11.5px;opacity:.5;margin-top:3px}
 .d-b .stops p{font-size:11.5px;line-height:1.48;opacity:.62;margin:8px 0 0}
@@ -227,7 +231,7 @@ svg{display:block}
       </div>
     </div>
     <div class="board"><div class="d-b" id="board-b"></div></div>
-    <div class="caption">B · street network built as rotated district grids — the same footprints the 3D massing will stand on.</div>
+    <div class="caption">B · Shanghai at city scale — Songjiang to the estuary. Three other themed trails sit dimmed behind the lit one.</div>
   </section>
 
   <!-- ============ C ============ -->
@@ -256,27 +260,30 @@ svg{display:block}
          in full rather than summarised, and that matters more here than it would on most projects: the claim
          is that the promenade smooths over what the body notices, and you cannot make that claim on a map that
          has already smoothed the city into six dots and a line. Every street is there; the route is the one
-         thing lit. Everything else in the system should be built to serve that board.</p>
+         thing lit. Everything else in the system should be built to serve that board. It is also the only
+         board drawn on real Shanghai — the Huangpu turning east at the Bund with Lujiazui in the crook,
+         Suzhou Creek joining at Waibaidu, the ring roads — which is what makes the other three themed trails
+         placeable on it at all.</p>
       <div class="pick">
         <b>Map view + filters</b> ····· B<br>
         <b>Pin detail</b> ············ B’s dark card<br>
         <b>Trail narrative view</b> ··· C — leader-line labels, elevation section<br>
-        <b>House palette</b> ········· B (near-black / warm white / magenta, one cyan)
+        <b>House palette</b> ········· B (near-black / warm white / light green)
       </div>
       <p><strong>C stays, as the reading surface.</strong> Not as a rival direction — as the annotation grammar
          B doesn’t have room for. The ✗ marks are already in B because the idea is too central to leave out,
          but the boxed leader-line labels and the west-to-east elevation belong on the trail page, where a stop
-         gets a paragraph and a photograph. Its vermilion becomes the magenta; nothing else changes.</p>
+         gets a paragraph and a photograph. Its vermilion becomes the green; nothing else changes.</p>
       <p><strong>A is now redundant.</strong> It is B in daylight — same composition, same single-route logic,
          less conviction. Keep it only if you need a light or print variant, and if you do, rebuild it as a
          white-ground version of B rather than maintaining a second palette.</p>
       <p><strong>On the 2D/3D question.</strong> The network here is generated as sixteen rotated district
          grids, which means the footprints already exist as data. The 3D pass is one transform on that same
          structure — extrude each district’s blocks at a fixed axonometric angle, light them from one side,
-         and leave the route flat and magenta on top so it stays the brightest thing on the board. The
+         and leave the route flat and green on top so it stays the brightest thing on the board. The
          elevation on C is the other half of the same idea, drawn by hand. Neither needs the 2D work redone.</p>
-      <p>Next, if you want it: swap the procedural street grid for real Yangshupu geometry, and build the
-         same board at three zooms to confirm the density survives.</p>
+      <p>Next, if you want it: swap the traced network for real OSM geometry, and build the same board at
+         three zooms — metropolitan, district, street — to confirm the density survives the whole way down.</p>
     </div>
   </section>
 </div>
@@ -401,32 +408,60 @@ function boardA(){
 }
 
 /* ── B · night network ────────────────────────────────────────────────────── */
-const LAND = SHORE + ' L1020,-20 L-20,-20 Z';
-
-/* Rotated district grids. Shanghai reads as a dozen grids at different angles
-   meeting badly, so that is what this draws — and the district frames double as
-   the footprints the 3D massing stands on.
-   ponytail: procedural stand-in for OSM geometry; swap in real ways when there is a data layer. */
-const DISTRICTS = [
-  {x:80, y:100, w:250,h:210,r:-8, g:15}, {x:305,y:74, w:265,h:175,r:5,  g:13},
-  {x:545,y:56, w:245,h:150,r:-12,g:17}, {x:800,y:44, w:310,h:135,r:6,  g:14},
-  {x:66, y:305, w:200,h:190,r:-20,g:12}, {x:250,y:262,w:245,h:205,r:-19,g:16},
-  {x:470,y:214, w:235,h:195,r:-18,g:13}, {x:685,y:168,w:245,h:185,r:-16,g:15},
-  {x:885,y:138, w:225,h:175,r:-14,g:12}, {x:165,y:180,w:205,h:155,r:12, g:19},
-  {x:425,y:118, w:185,h:145,r:-32,g:16}, {x:620,y:298,w:160,h:130,r:-19,g:11},
-  {x:335,y:398, w:210,h:130,r:-19,g:14}, {x:865,y:296,w:185,h:130,r:-16,g:13},
-  {x:955,y:60,  w:150,h:150,r:-24,g:16}, {x:185,y:432,w:190,h:120,r:-21,g:17},
-  {x:255,y:352, w:205,h:125,r:-19,g:11}, {x:455,y:302,w:195,h:115,r:-17,g:10},
-  {x:140,y:392, w:175,h:105,r:-22,g:12}, {x:735,y:250,w:170,h:110,r:-15,g:11}
+/* Central Shanghai, roughly Changning to Fuxing Island. Stylised but placed where
+   the real thing is: the Huangpu comes up from the south, turns east at the Bund
+   with Lujiazui in the crook, then runs north-east past Yangpu; Suzhou Creek joins
+   at Waibaidu; Inner and Middle Ring; roads cross the water only at bridges.
+   ponytail: hand-traced geometry; swap for OSM/GeoJSON when there's a data layer. */
+const HUANGPU = 'M230,640 C258,572 292,506 330,442 C352,404 372,374 396,352 '
+  + 'C430,320 480,306 540,306 C580,306 612,312 642,299 C686,280 714,242 740,196 '
+  + 'C766,150 790,86 800,30 L804,-10';
+const SUZHOU  = 'M0,268 C70,292 130,262 196,290 C258,316 300,286 348,312 C376,328 386,334 400,344';
+const BRIDGES = ['M312,432 L410,378','M666,212 L740,266','M254,540 L344,488','M498,268 L508,346','M576,272 L588,342'];
+const RINGS = [
+  'M160,400 C160,290 250,206 400,200 C560,194 660,270 664,392 C668,510 560,590 400,592 C250,594 160,510 160,400 Z',
+  'M40,420 C30,250 180,80 420,70 C680,60 830,200 840,400 C850,610 690,730 420,726 C170,722 50,590 40,420 Z'
 ];
 const ARTERIALS = [
-  'M-20,415 C200,392 420,352 700,286 C820,258 900,232 1020,196',
-  'M-20,300 C240,272 500,214 1020,90',
-  'M-20,168 C260,140 560,86 1020,4',
-  'M118,-20 L18,505',  'M332,-20 L214,520', 'M562,-20 L432,470',
-  'M782,-20 L642,420', 'M962,-20 L852,352',
-  'M60,52 C260,176 420,116 620,196 C760,252 880,236 1020,296'
+  'M0,392 C140,378 280,368 396,352', 'M396,352 C470,370 560,394 700,434',
+  'M392,20 C398,180 396,290 392,392 C388,500 384,570 380,640',
+  'M120,150 C230,235 320,305 392,352', 'M120,600 C220,530 320,442 392,392',
+  'M650,90 C570,175 460,290 396,352'
 ];
+const DISTRICTS = [
+  {x:330,y:380,w:122,h:102,r:-6, g:8},  {x:270,y:420,w:132,h:112,r:4,  g:9},
+  {x:360,y:452,w:112,h:96, r:-10,g:9},  {x:300,y:330,w:122,h:102,r:10, g:9},
+  {x:380,y:300,w:112,h:92, r:-14,g:10}, {x:230,y:360,w:122,h:102,r:-2, g:9},
+  {x:200,y:470,w:132,h:112,r:6,  g:10}, {x:330,y:522,w:132,h:112,r:-6, g:10},
+  {x:150,y:410,w:122,h:102,r:12, g:11}, {x:80, y:300,w:152,h:132,r:8,  g:13},
+  {x:70, y:520,w:162,h:142,r:-6, g:13}, {x:160,y:220,w:152,h:132,r:12, g:14},
+  {x:300,y:180,w:152,h:132,r:-8, g:13}, {x:240,y:600,w:162,h:132,r:4,  g:14},
+  {x:80, y:622,w:152,h:122,r:-4, g:15}, {x:470,y:250,w:132,h:112,r:-14,g:9},
+  {x:560,y:215,w:132,h:112,r:-16,g:9},  {x:650,y:190,w:132,h:112,r:-18,g:10},
+  {x:500,y:150,w:142,h:122,r:-10,g:11}, {x:620,y:100,w:152,h:132,r:-14,g:12},
+  {x:748,y:118,w:152,h:132,r:-16,g:13}, {x:430,y:106,w:142,h:122,r:-6, g:12},
+  {x:520,y:404,w:162,h:142,r:-6, g:14}, {x:646,y:382,w:172,h:146,r:-4, g:15},
+  {x:622,y:502,w:172,h:146,r:6,  g:15}, {x:782,y:442,w:176,h:150,r:-8, g:16},
+  {x:806,y:302,w:162,h:142,r:-10,g:16}, {x:782,y:592,w:172,h:142,r:-6, g:17},
+  {x:462,y:562,w:162,h:142,r:-8, g:15}, {x:906,y:180,w:152,h:132,r:-12,g:16}
+];
+const PLACES = [
+  [286,468,'SHANGHAI',21,7],   [152,208,'PUTUO',11,2.2],   [396,212,'ZHABEI',11,2.2],
+  [502,238,'HONGKOU',11,2.2],  [654,196,'YANGPU',11,2.2],  [672,74,'BAOSHAN',11,2.2],
+  [258,368,'JING’AN',10,2],    [370,336,'THE BUND',9.5,1.5],[492,356,'LUJIAZUI',10,2],
+  [238,542,'XUHUI',11,2.2],    [104,400,'CHANGNING',11,2.2],[716,470,'PUDONG',11,2.2],
+  [326,626,'MINHANG',11,2.2],  [898,378,'CHUANSHA',10,2]
+];
+const OTHERS = [
+  ['M300,430 C332,392 382,376 424,392 C462,406 464,452 428,478 C388,506 322,502 296,472 C276,450 282,444 300,430 Z',
+   'Former concession line', 'colonial_history'],
+  ['M400,344 C376,330 348,312 300,286 C258,262 196,290 130,262 C74,238 40,254 0,268',
+   'Upper Suzhou Creek', 'urban_village'],
+  ['M262,548 C312,524 382,530 420,558 C456,584 446,626 396,638 C338,652 278,630 262,592 C254,572 254,558 262,548 Z',
+   'Night route, Xuhui', 'gender_friendliness']
+];
+const ROUTE_SH = 'M566,272 L598,264 L626,258 L644,288 L662,278 L676,242 L700,214 L672,196 L706,188 L730,166 L748,140';
+const SH_STOPS = [[566,272],[626,258],[676,242],[700,214],[672,196],[748,140]];
 
 function boardB(){
   let net = '', clips = '';
@@ -450,8 +485,8 @@ function boardB(){
     }
     clips += `<clipPath id="dc${k}"><polygon points="${pts.join(' ')}"/></clipPath>`;
     net += `<g transform="translate(${d.x},${d.y}) rotate(${d.r})"><g clip-path="url(#dc${k})">`
-         + `<path d="${t}" stroke-width=".75" stroke-opacity=".6"/>`
-         + `<path d="${m}" stroke-width="1.9" stroke-opacity=".92"/></g></g>`;
+         + `<path d="${t}" stroke-width=".75" stroke-opacity=".55"/>`
+         + `<path d="${m}" stroke-width="1.8" stroke-opacity=".88"/></g></g>`;
   });
 
   const strip = STOPS.map(s => `
@@ -459,43 +494,64 @@ function boardB(){
       <h4>${s.en}</h4><div class="zh">${s.zh} · ${s.yr}</div><p>${s.short}</p>
       <span class="tg">${TAGS[s.tag].zh} ${TAGS[s.tag].en}</span></div>`).join('');
   const pin = STOPS[1];
-  const cross = (x,y) => `<g><path d="M${x-12},${y-12} L${x+12},${y+12} M${x+12},${y-12} L${x-12},${y+12}"
-      stroke="#121212" stroke-width="9" stroke-linecap="round"/>
-    <path d="M${x-12},${y-12} L${x+12},${y+12} M${x+12},${y-12} L${x-12},${y+12}"
-      stroke="#F2F0EC" stroke-width="3.4" stroke-linecap="round"/></g>`;
+  const cross = (x,y) => `<g><path d="M${x-10},${y-10} L${x+10},${y+10} M${x+10},${y-10} L${x-10},${y+10}"
+      stroke="#121212" stroke-width="8" stroke-linecap="round"/>
+    <path d="M${x-10},${y-10} L${x+10},${y+10} M${x+10},${y-10} L${x-10},${y+10}"
+      stroke="#F2F0EC" stroke-width="3" stroke-linecap="round"/></g>`;
 
   document.getElementById('board-b').innerHTML = `
+  <div class="topbar"><b>03. SHANGHAI</b> — 杨树浦路 YANGSHUPU ROAD — Y. ZHOU &amp; K. LIN</div>
   <div class="map">
-    <svg viewBox="0 0 1000 560" width="100%" role="img"
-         aria-label="The Yangshupu street network drawn in white on black, with the six-stop trail lit in magenta.">
-      <defs>
-        <clipPath id="landClip"><path d="${LAND}"/></clipPath>
-        ${clips}
+    <svg viewBox="0 0 1000 640" width="100%" role="img"
+         aria-label="Central Shanghai drawn as a white street network on black: the Huangpu turning east at the Bund, Suzhou Creek, the ring roads, and four walking trails, with the Yangshupu Road trail lit in green.">
+      <defs>${clips}
         <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/>
           <feColorMatrix type="saturate" values="0"/></filter>
       </defs>
-      <rect width="1000" height="560" fill="#121212"/>
-      <g clip-path="url(#landClip)" stroke="#F2F0EC" fill="none" stroke-linecap="square">
-        ${net}
-        <g stroke-width="3.6" stroke-opacity="1">${ARTERIALS.map(d=>`<path d="${d}"/>`).join('')}</g>
+      <rect width="1000" height="640" fill="#121212"/>
+      <g stroke="#F2F0EC" fill="none" stroke-linecap="square">${net}</g>
+      <g stroke="#F2F0EC" fill="none" stroke-opacity=".48" stroke-width="1.8">
+        ${RINGS.map(d=>`<path d="${d}"/>`).join('')}</g>
+      <g stroke="#F2F0EC" fill="none" stroke-opacity=".82" stroke-width="2.9">
+        ${ARTERIALS.map(d=>`<path d="${d}"/>`).join('')}</g>
+
+      <!-- water is a void punched through the network; only bridges cross it -->
+      <g fill="none" stroke="#121212" stroke-linecap="round">
+        <path d="${HUANGPU}" stroke-width="30"/><path d="${SUZHOU}" stroke-width="13"/>
       </g>
-      <path d="M846,232 L1000,462" stroke="#F2F0EC" stroke-width="3.4" fill="none"/>
-      <path d="M928,148 L992,214" stroke="#5FD8D3" stroke-width="3" fill="none"/>
-      <text x="330" y="530" fill="#F2F0EC" fill-opacity=".34" font-size="12" font-weight="700"
-            font-stretch="74%" letter-spacing="4.5">黄浦江 HUANGPU RIVER</text>
-      <path class="route" d="${ROUTE_PLAN}" pathLength="1" fill="none" stroke="#121212"
-            stroke-width="13" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9"/>
-      <path class="route" d="${ROUTE_PLAN}" pathLength="1" fill="none" stroke="#EE2B8C"
-            stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-      ${cross(352,446)}${cross(856,228)}
-      ${STOPS.map(s => `
-        <circle cx="${s.x}" cy="${s.y}" r="9.5" fill="#EE2B8C" stroke="#121212" stroke-width="2.5"/>
-        <text x="${s.x}" y="${s.y+3.8}" text-anchor="middle" fill="#121212" font-size="11.5"
-              font-weight="800">${s.n}</text>
-        <text x="${s.x+s.la.dx}" y="${s.y+s.la.dy}" text-anchor="${s.la.a}" fill="#F2F0EC" font-size="12"
-              font-weight="700" font-stretch="76%" letter-spacing="1.5" stroke="#121212" stroke-width="3.4"
-              paint-order="stroke">${s.en.toUpperCase()}</text>`).join('')}
-      <rect width="1000" height="560" filter="url(#grain)" opacity=".2" style="mix-blend-mode:overlay"/>
+      <g fill="none" stroke="#7FA8BE" stroke-opacity=".4" stroke-linecap="round">
+        <path d="${HUANGPU}" stroke-width="30.5" stroke-opacity=".13"/>
+        <path d="${HUANGPU}" stroke-width="1.2"/><path d="${SUZHOU}" stroke-width="1"/>
+      </g>
+      <g stroke="#F2F0EC" fill="none" stroke-width="3.2" stroke-opacity=".95" stroke-linecap="butt">
+        ${BRIDGES.map(d=>`<path d="${d}"/>`).join('')}</g>
+
+      <g fill="none" stroke="#F2F0EC" stroke-opacity=".3" stroke-width="2.6">
+        ${OTHERS.map(o=>`<path d="${o[0]}"/>`).join('')}</g>
+
+      <g font-family="Archivo, sans-serif" font-weight="700" font-stretch="80%" fill="#F2F0EC"
+         stroke="#121212" paint-order="stroke" text-anchor="middle">
+        ${PLACES.map(([x,y,t,fs,ls])=>`<text x="${x}" y="${y}" font-size="${fs}" letter-spacing="${ls}"
+          stroke-width="${fs>15?5:3.4}" fill-opacity="${fs>15?.46:.66}">${t}</text>`).join('')}
+      </g>
+      <g fill="#8FB6C9" fill-opacity=".75" font-family="Archivo, sans-serif" font-weight="600"
+         font-size="10.5" font-stretch="82%" letter-spacing="2.4" stroke="#121212" stroke-width="3.2"
+         paint-order="stroke">
+        <text transform="translate(268,566) rotate(-61)">黄浦江 HUANGPU</text>
+        <text transform="translate(58,258) rotate(15)">苏州河 SUZHOU CREEK</text>
+        <text transform="translate(742,124) rotate(-56)">吴淞口 TO THE YANGTZE</text>
+      </g>
+
+      <path class="route" d="${ROUTE_SH}" pathLength="1" fill="none" stroke="#121212"
+            stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".92"/>
+      <path class="route" d="${ROUTE_SH}" pathLength="1" fill="none" stroke="#9EE86B"
+            stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${cross(650,284)}${cross(738,152)}
+      ${SH_STOPS.map(([x,y],k)=>`
+        <circle cx="${x}" cy="${y}" r="9" fill="#9EE86B" stroke="#121212" stroke-width="2.4"/>
+        <text x="${x}" y="${y+3.7}" text-anchor="middle" fill="#121212" font-size="11"
+              font-weight="800" font-family="Archivo, sans-serif">${k+1}</text>`).join('')}
+      <rect width="1000" height="640" filter="url(#grain)" opacity=".2" style="mix-blend-mode:overlay"/>
     </svg>
     <div class="pincard">
       <div class="n">Stop 02 · 0.9 km · Y. Zhou · 19.08.26</div>
@@ -503,17 +559,16 @@ function boardB(){
       <p>${pin.short}</p>
       <span class="tg">${TAGS[pin.tag].zh} ${TAGS[pin.tag].en}</span>
     </div>
-    <div class="title">
-      <h3>Yangshupu<br>Road</h3>
-      <div class="zh">杨树浦路：水厂到电厂</div>
-      <div class="sub">Six stops, 5.4 km · walked 19.08.2026 · Y. Zhou &amp; K. Lin</div>
+    <div class="key">
+      <div class="on">杨树浦路 Yangshupu Road · industrial zone<i></i></div>
+      ${OTHERS.map(o=>`<div>${o[1]}<i></i></div>`).join('')}
     </div>
   </div>
   <div class="bar">
     <span class="lbl">Theme</span>
     <span class="chip on">Industrial zone</span><span class="chip">Colonial history</span>
     <span class="chip">Urban village</span><span class="chip">Gender &amp; public space</span>
-    <span class="facts">5.4 km · 2 h 10 · 6 stops · 23 photographs</span>
+    <span class="facts">4 trails · this one 5.4 km · 2 h 10 · 6 stops</span>
   </div>
   <div class="stops">${strip}</div>`;
 }
