@@ -110,7 +110,7 @@ svg{display:block}
 .d-b .pincard .tg{display:inline-block;margin-top:12px;background:#9EE86B;color:#121212;font-size:10px;
   font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px}
 .d-b .key{position:absolute;right:26px;bottom:26px;align-items:flex-end;display:flex;flex-direction:column;gap:7px}
-.d-b .key div{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:600;opacity:.55;text-shadow:0 0 7px #121212,0 0 3px #121212}
+.d-b .key div{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:600;opacity:.55;text-shadow:0 0 9px #121212,0 0 5px #121212,0 0 2px #121212}
 .d-b .key div.on{opacity:1}
 .d-b .key i{width:22px;height:3px;background:rgba(242,240,236,.4);flex:none;border-radius:2px}
 .d-b .key div.on i{background:#9EE86B;height:4px}
@@ -419,14 +419,16 @@ const HUANGPU = 'M230,640 C258,572 292,506 330,442 C352,404 372,374 396,352 '
 const SUZHOU  = 'M0,268 C70,292 130,262 196,290 C258,316 300,286 348,312 C376,328 386,334 400,344';
 const BRIDGES = ['M312,432 L410,378','M666,212 L740,266','M254,540 L344,488','M498,268 L508,346','M576,272 L588,342'];
 const RINGS = [
-  'M160,400 C160,290 250,206 400,200 C560,194 660,270 664,392 C668,510 560,590 400,592 C250,594 160,510 160,400 Z',
-  'M40,420 C30,250 180,80 420,70 C680,60 830,200 840,400 C850,610 690,730 420,726 C170,722 50,590 40,420 Z'
+  'M162,404 C158,300 232,214 372,200 C486,189 596,232 652,318 C700,392 668,486 566,548 '
+  + 'C470,606 330,600 236,540 C176,502 166,462 162,404 Z',
+  'M44,430 C26,262 168,96 404,72 C606,52 782,138 836,326 C884,494 766,656 500,712 '
+  + 'C298,754 96,650 52,516 C46,494 45,462 44,430 Z'
 ];
 const ARTERIALS = [
   'M0,392 C140,378 280,368 396,352', 'M396,352 C470,370 560,394 700,434',
   'M392,20 C398,180 396,290 392,392 C388,500 384,570 380,640',
-  'M120,150 C230,235 320,305 392,352', 'M120,600 C220,530 320,442 392,392',
-  'M650,90 C570,175 460,290 396,352'
+  'M150,168 C248,250 332,314 392,352', 'M148,596 C240,528 330,444 392,392',
+  'M634,104 C562,188 456,292 396,352'
 ];
 const DISTRICTS = [
   {x:330,y:380,w:122,h:102,r:-6, g:8},  {x:270,y:420,w:132,h:112,r:4,  g:9},
@@ -463,30 +465,65 @@ const OTHERS = [
 const ROUTE_SH = 'M566,272 L598,264 L626,258 L644,288 L662,278 L676,242 L700,214 L672,196 L706,188 L730,166 L748,140';
 const SH_STOPS = [[566,272],[626,258],[676,242],[700,214],[672,196],[748,140]];
 
+/* A city is irregular block subdivision, not a lattice. Split each district
+   recursively at jittered positions (depth sets the road's weight, so hierarchy
+   falls out for free), stop early sometimes for works and estates, then push
+   every line through a smooth noise field so nothing is ruler-straight. */
+function warp(x, y){
+  return [x + 7 * (Math.sin(x*.0135 + y*.0071) + .55*Math.sin(x*.0312 - y*.0248)),
+          y + 7 * (Math.cos(y*.0118 - x*.0052) + .55*Math.cos(x*.0271 + y*.0193))];
+}
+function warped(x1, y1, x2, y2){
+  const n = Math.max(1, Math.round(Math.hypot(x2-x1, y2-y1) / 20));
+  let d = '';
+  for (let i = 0; i <= n; i++){
+    const t = i/n, [px, py] = warp(x1 + (x2-x1)*t, y1 + (y2-y1)*t);
+    d += (i ? 'L' : 'M') + px.toFixed(0) + ',' + py.toFixed(0);
+  }
+  return d;
+}
+function blocks(x, y, w, h, min, depth, out){
+  if (depth > 11 || (w < min && h < min)) return;
+  if (depth > 3 && rand() < .045) return;              // works, estates, parks
+  const f = .3 + rand() * .4;
+  if (w > h){
+    const t = x + w * f;
+    out.push([t, y, t, y+h, depth]);
+    blocks(x, y, t-x, h, min, depth+1, out); blocks(t, y, x+w-t, h, min, depth+1, out);
+  } else {
+    const t = y + h * f;
+    out.push([x, t, x+w, t, depth]);
+    blocks(x, y, w, t-y, min, depth+1, out); blocks(x, t, w, y+h-t, min, depth+1, out);
+  }
+}
+
 function boardB(){
   let net = '', clips = '';
   DISTRICTS.forEach((d, k) => {
-    const hw = d.w * .68, hh = d.h * .68;          // overdraw, then cut with the polygon
-    let t = '', m = '', i = 0;
-    for (let x = -hw; x <= hw; x += d.g){
-      const seg = `M${x.toFixed(1)},${(-hh).toFixed(1)} L${x.toFixed(1)},${hh.toFixed(1)}`;
-      (i++ % 4 === 0 ? (m += seg) : (t += seg));
-    }
-    i = 0;
-    for (let y = -hh; y <= hh; y += d.g * 1.4){
-      const seg = `M${(-hw).toFixed(1)},${y.toFixed(1)} L${hw.toFixed(1)},${y.toFixed(1)}`;
-      (i++ % 3 === 0 ? (m += seg) : (t += seg));
-    }
+    const a = d.r * Math.PI / 180, c = Math.cos(a), si = Math.sin(a);
+    const toMap = (px, py) => [d.x + px*c - py*si, d.y + px*si + py*c];
+    const W = d.w * 1.18, H = d.h * 1.18, MIN = d.g * .68;   // districts overlap; no gaps
+    const out = [];
+    blocks(-W/2, -H/2, W, H, MIN, 0, out);
+    let L1 = '', L2 = '', L3 = '';
+    out.forEach(([x1, y1, x2, y2, dep]) => {
+      const p = toMap(x1, y1), q = toMap(x2, y2);
+      const seg = warped(p[0], p[1], q[0], q[1]);
+      if (dep <= 1) L1 += seg; else if (dep <= 3) L2 += seg; else L3 += seg;
+    });
     const pts = [];
-    for (let a = 0; a < 7; a++){
-      const th = a / 7 * Math.PI * 2;
-      pts.push(`${(Math.cos(th) * d.w/2 * (1 + rand()*.5 - .12)).toFixed(1)},`
-             + `${(Math.sin(th) * d.h/2 * (1 + rand()*.5 - .12)).toFixed(1)}`);
+    for (let i = 0; i < 7; i++){
+      const th = i / 7 * Math.PI * 2;
+      const p = toMap(Math.cos(th) * W/2 * (1.06 + rand()*.4),
+                      Math.sin(th) * H/2 * (1.06 + rand()*.4));
+      const wp = warp(p[0], p[1]);
+      pts.push(`${wp[0].toFixed(1)},${wp[1].toFixed(1)}`);
     }
     clips += `<clipPath id="dc${k}"><polygon points="${pts.join(' ')}"/></clipPath>`;
-    net += `<g transform="translate(${d.x},${d.y}) rotate(${d.r})"><g clip-path="url(#dc${k})">`
-         + `<path d="${t}" stroke-width=".75" stroke-opacity=".55"/>`
-         + `<path d="${m}" stroke-width="1.8" stroke-opacity=".88"/></g></g>`;
+    net += `<g clip-path="url(#dc${k})">`
+         + `<path d="${L1}" stroke-width="2.1" stroke-opacity=".92"/>`
+         + `<path d="${L2}" stroke-width="1.25" stroke-opacity=".78"/>`
+         + `<path d="${L3}" stroke-width=".72" stroke-opacity=".5"/></g>`;
   });
 
   const strip = STOPS.map(s => `
@@ -509,7 +546,7 @@ function boardB(){
           <feColorMatrix type="saturate" values="0"/></filter>
       </defs>
       <rect width="1000" height="640" fill="#121212"/>
-      <g stroke="#F2F0EC" fill="none" stroke-linecap="square">${net}</g>
+      <g stroke="#F2F0EC" fill="none" stroke-linecap="round" stroke-linejoin="round">${net}</g>
       <g stroke="#F2F0EC" fill="none" stroke-opacity=".48" stroke-width="1.8">
         ${RINGS.map(d=>`<path d="${d}"/>`).join('')}</g>
       <g stroke="#F2F0EC" fill="none" stroke-opacity=".82" stroke-width="2.9">
@@ -532,10 +569,10 @@ function boardB(){
       <g font-family="Archivo, sans-serif" font-weight="700" font-stretch="80%" fill="#F2F0EC"
          stroke="#121212" paint-order="stroke" text-anchor="middle">
         ${PLACES.map(([x,y,t,fs,ls])=>`<text x="${x}" y="${y}" font-size="${fs}" letter-spacing="${ls}"
-          stroke-width="${fs>15?5:3.4}" fill-opacity="${fs>15?.46:.66}">${t}</text>`).join('')}
+          stroke-width="${fs>15?7:4.6}" fill-opacity="${fs>15?.58:.78}">${t}</text>`).join('')}
       </g>
       <g fill="#8FB6C9" fill-opacity=".75" font-family="Archivo, sans-serif" font-weight="600"
-         font-size="10.5" font-stretch="82%" letter-spacing="2.4" stroke="#121212" stroke-width="3.2"
+         font-size="10.5" font-stretch="82%" letter-spacing="2.4" stroke="#121212" stroke-width="4.2"
          paint-order="stroke">
         <text transform="translate(268,566) rotate(-61)">黄浦江 HUANGPU</text>
         <text transform="translate(58,258) rotate(15)">苏州河 SUZHOU CREEK</text>
