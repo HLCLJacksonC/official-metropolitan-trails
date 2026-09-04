@@ -18,27 +18,34 @@ THEMES = [
          note='Neutral dark. The city is white, the walk is the only colour in it.',
          ground='#121212', street='#F2F0EC', water='#7FA8BE', waterFill='#1B2A31',
          waterLabel='#8FB6C9', accent='#9EE86B', label='#F2F0EC',
-         rule='rgba(242,240,236,.3)', grain='.2'),
+         rule='rgba(242,240,236,.3)', grain='.2',
+         waterPunch='#121212', op1='.95', op2='.72', op3='.46', otherOp='.38'),
     dict(id='cyanotype', name='Cyanotype', zh='蓝晒',
          note='The waterworks and the power station were drawn in this palette. Amber is the annotation ink.',
          ground='#0A2137', street='#C3DAEA', water='#5E93B5', waterFill='#0E2C45',
          waterLabel='#7FB0CE', accent='#F2C14E', label='#DCEAF4',
-         rule='rgba(220,234,244,.32)', grain='.18'),
+         rule='rgba(220,234,244,.32)', grain='.18',
+         waterPunch='#0A2137', op1='.95', op2='.72', op3='.46', otherOp='.4'),
     dict(id='sodium', name='Sodium', zh='钠灯',
          note='Sodium street lighting against the cold LED of the new promenade — the two lights this walk happens under after dark.',
          ground='#14100B', street='#E3B571', water='#5A4A32', waterFill='#1E1810',
          waterLabel='#A8875A', accent='#6FD8E0', label='#F2DFBE',
-         rule='rgba(242,223,190,.3)', grain='.22'),
+         rule='rgba(242,223,190,.3)', grain='.22',
+         waterPunch='#14100B', op1='.95', op2='.72', op3='.46', otherOp='.4'),
     dict(id='silt', name='Silt', zh='泥沙',
          note='The Huangpu’s own colour, and the oxide red of everything on this route that has stopped working.',
          ground='#191C18', street='#DAD5C4', water='#6E6647', waterFill='#221F16',
          waterLabel='#9A9070', accent='#E4572E', label='#E8E3D3',
-         rule='rgba(232,227,211,.3)', grain='.2'),
+         rule='rgba(232,227,211,.3)', grain='.2',
+         waterPunch='#191C18', op1='.95', op2='.72', op3='.46', otherOp='.38'),
+    # Not an inverted dark palette: on paper the water is a printed tint rather than a
+    # void, the minor roads drop back hard, and the other trails have to come forward.
     dict(id='newsprint', name='Newsprint', zh='新闻纸',
-         note='The daylight and print answer. Hairlines carry the network; the route is ink red.',
-         ground='#EDEAE2', street='#33302C', water='#7C9BA6', waterFill='#DCE5E6',
-         waterLabel='#5A7783', accent='#C63A22', label='#26241F',
-         rule='rgba(38,36,31,.26)', grain='.08'),
+         note='Water is a printed tint, not a void, and the minor roads drop right back. The route is ink red.',
+         ground='#EDEAE2', street='#2E2B27', water='#6E93A1', waterFill='#D6E2E6',
+         waterLabel='#4B707E', accent='#C63A22', label='#22201C',
+         rule='rgba(34,32,28,.24)', grain='.05',
+         waterPunch='#D9E4E8', op1='.88', op2='.5', op3='.26', otherOp='.6'),
 ]
 ROLES = [('ground','Ground'), ('street','Street network'), ('water','Water'),
          ('accent','Trail'), ('label','Labels')]
@@ -46,7 +53,9 @@ ROLES = [('ground','Ground'), ('street','Street network'), ('water','Water'),
 theme_css = '\n'.join(
     f'.cv[data-t="{t["id"]}"]{{--ground:{t["ground"]};--street:{t["street"]};--water:{t["water"]};'
     f'--water-fill:{t["waterFill"]};--water-label:{t["waterLabel"]};--accent:{t["accent"]};'
-    f'--label:{t["label"]};--rule:{t["rule"]};--grain:{t["grain"]}}}' for t in THEMES)
+    f'--label:{t["label"]};--rule:{t["rule"]};--grain:{t["grain"]};'
+    f'--water-punch:{t["waterPunch"]};--op1:{t["op1"]};--op2:{t["op2"]};--op3:{t["op3"]};'
+    f'--other-op:{t["otherOp"]}}}' for t in THEMES)
 
 cards = '\n'.join(f'''      <button type="button" class="tcard" data-set="{t['id']}" aria-pressed="false">
         <span class="sw"><i style="background:{t['ground']}"></i><i style="background:{t['street']}"></i><i style="background:{t['water']}"></i><i style="background:{t['accent']}"></i></span>
@@ -109,7 +118,11 @@ h1,h2{{text-wrap:balance;margin:0}}
 .cv svg{{display:block}}
 .cv .bg{{fill:var(--ground)}}
 .cv .net{{stroke:var(--street)}}
-.cv .punch{{stroke:var(--ground)}}
+.cv .n1{{stroke-opacity:var(--op1)}}
+.cv .n2{{stroke-opacity:var(--op2)}}
+.cv .n3{{stroke-opacity:var(--op3)}}
+.cv .other{{stroke-opacity:var(--other-op)}}
+.cv .punch{{stroke:var(--water-punch)}}
 .cv .tint{{stroke:var(--water)}}
 .cv .lake{{fill:var(--water-fill);stroke:var(--water)}}
 .cv .other-h{{stroke:var(--ground)}}
@@ -202,7 +215,7 @@ td i{{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right
 {cards}
   </div>
 
-  <div class="board"><div class="cv" id="cv" data-t="night"></div></div>
+  <div class="board"><div class="cv" id="cv" data-t="newsprint"></div></div>
   <div class="caption">Live re-theme — eight custom properties drive the map, the labels and every piece of chrome.</div>
 
   <section class="specs">
@@ -217,19 +230,24 @@ td i{{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right
   <section class="note-out">
     <h2>Reading them</h2>
     <div>
-      <p><strong>Night</strong> is the safest and the least specific — it could be any city. It wins on legibility
-         and loses on argument.</p>
-      <p><strong>Cyanotype</strong> and <strong>Sodium</strong> both earn their colour from the subject.
-         Cyanotype is the drawing office the waterworks came out of; Sodium is the light the walk actually
-         happens under after dark, with the cold accent standing in for the new promenade’s LED. Sodium is the
-         riskier and more memorable of the two, and the amber network costs some legibility at hairline weight.</p>
-      <p><strong>Silt</strong> is the most site-specific: the river’s real colour, and the oxide red of a route
-         made of things that have stopped working. It is also the quietest, which suits research that does not
-         want to shout.</p>
-      <p><strong>Newsprint</strong> is not a rival — it is the print and daylight variant you will need anyway.
-         Whichever dark palette wins, this is its other half.</p>
-      <p>If you want a recommendation: <strong>Silt for the identity, Newsprint for print.</strong> Sodium is the
-         one to keep if the project turns out to be about night walking specifically.</p>
+      <p><strong>Newsprint is the one to beat</strong>, and it opens on it. It has had a proper light-map pass
+         rather than being an inverted dark palette: the water is a printed tint instead of a void, the minor
+         roads drop back to a quarter strength so the arterials carry the structure, and the other trails come
+         forward — on paper a 38% line simply disappears. It reads as something printed rather than something
+         rendered, which suits a project whose output is a walk and a set of notes rather than an app.</p>
+      <p><strong>What adopting it costs.</strong> The gallery board is still green on black, so that would
+         change too — one palette, not two. A light ground also gives up the thing the dark palettes do best:
+         on black the lit route is the only bright object on the board and needs no help. On paper the route
+         competes with the network, which is why the minor roads had to drop so far back. Watch that on the
+         busiest trails.</p>
+      <p><strong>The dark four, briefly.</strong> Night is the safest and the least specific — it could be any
+         city. Cyanotype is the drawing office the waterworks came out of. Sodium is the light this walk
+         actually happens under after dark, and is the one to revisit if the project turns toward night
+         walking. Silt is the river’s own colour and the oxide red of everything on the route that has stopped
+         working — the most site-specific of them, and the strongest dark counter-proposal.</p>
+      <p>If Newsprint stands, the open question is the accent: <strong>ink red</strong> is doing a lot of work
+         here and is the one value that will end up on everything. Worth testing against a deep green and an
+         ink blue before it hardens.</p>
     </div>
   </section>
 </div>
@@ -260,8 +278,8 @@ document.getElementById('cv').innerHTML = `
     <rect class="bg" width="1000" height="640"/>
     <path class="lake" d="${{OSM.lake}}" stroke-opacity=".22" stroke-width=".8"/>
     <g class="net" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="${{OSM.c}}" stroke-width=".62" stroke-opacity=".46"/>
-      <path d="${{OSM.b}}" stroke-width="1.15" stroke-opacity=".72"/>
+      <path class="n3" d="${{OSM.c}}" stroke-width=".62"/>
+      <path class="n2" d="${{OSM.b}}" stroke-width="1.15"/>
     </g>
     <g class="punch" fill="none" stroke-linecap="round" stroke-linejoin="round">
       ${{OSM.riv.map(r=>`<path d="${{r[0]}}" stroke-width="${{r[1]}}"/>`).join('')}}
@@ -270,11 +288,11 @@ document.getElementById('cv').innerHTML = `
       ${{OSM.riv.map(r=>`<path d="${{r[0]}}" stroke-width="${{r[1]}}" stroke-opacity=".1"/>`).join('')}}
     </g>
     <g class="net" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="${{OSM.a}}" stroke-width="2.3" stroke-opacity=".95"/>
+      <path class="n1" d="${{OSM.a}}" stroke-width="2.3"/>
     </g>
     <g fill="none" stroke-linejoin="round" stroke-linecap="round">
       ${{OSM.others.map(o=>`<path class="other-h" d="${{o[0]}}" stroke-width="7" stroke-opacity=".85"/>`).join('')}}
-      ${{OSM.others.map(o=>`<path class="other" d="${{o[0]}}" stroke-width="2.6" stroke-opacity=".38"/>`).join('')}}
+      ${{OSM.others.map(o=>`<path class="other" d="${{o[0]}}" stroke-width="2.6"/>`).join('')}}
     </g>
     <g class="place" font-family="Archivo, sans-serif" font-weight="700" font-stretch="80%"
        paint-order="stroke" text-anchor="middle">
@@ -326,7 +344,7 @@ function pick(id){{
 cards.forEach(c => c.addEventListener('click', () => pick(c.dataset.set)));
 let saved = null;
 try {{ saved = localStorage.getItem('mt-palette'); }} catch (e) {{}}
-pick(cards.some(c => c.dataset.set === saved) ? saved : 'night');
+pick(cards.some(c => c.dataset.set === saved) ? saved : 'newsprint');
 
 const io = new IntersectionObserver(es => es.forEach(e => {{
   if (e.isIntersecting) {{ e.target.classList.add('in'); io.unobserve(e.target); }}
