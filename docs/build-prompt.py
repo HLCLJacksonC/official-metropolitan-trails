@@ -8,6 +8,28 @@ zones, urban villages and migrant communities, and how gender-friendly public sp
 This is NOT a public product. Access is by direct URL and everyone with the link is a
 trusted collaborator. No sign-up, no login, no accounts, no moderation.
 
+=== PLATFORM ===
+Web. A responsive single-page web app opened at a URL. Not native, not a PWA. No offline
+mode, no install prompt, no app shell.
+
+The primary device is a laptop, 1280-1680px wide: that is where the map is read, trails
+are compared and narratives are written. A phone browser must be good enough to add a pin
+and read a trail while standing in the street — iOS Safari especially, because the
+fieldwork happens on phones — but the phone is the secondary case, not the design driver.
+Tablet follows the desktop layout.
+
+There is no landing page, no marketing page and no home page. The URL opens directly onto
+the map with the seeded trail already visible. Anyone arriving has been invited.
+
+Interface language is English. Place names, stop titles and feeling tags carry 中文
+alongside the English. Do not build a language switcher.
+
+Responsive behaviour:
+  desktop   map fills the viewport; pin detail is a panel over the bottom-left; the stop
+            strip sits beneath the map; the key panel sits bottom-right.
+  phone     map fills the viewport; pin detail becomes a bottom sheet; the stop strip
+            becomes a horizontal scroller; the key panel collapses to one line.
+
 === STACK ===
 React + Vite + TypeScript + Tailwind. Supabase for Postgres and Storage.
 MapLibre GL JS for the map (not Leaflet, not Google Maps).
@@ -262,12 +284,13 @@ footer{{margin:60px 0 80px;padding-top:18px;border-top:1px solid var(--rule);
   <header>
     <div>
       <h1>Paste this into Lovable</h1>
-      <p>The full MVP brief: stack, schema, five screens, the Newsprint design language and
-         the map style, plus one seeded trail with real coordinates. Written so Lovable has
+      <p>The full MVP brief: platform, stack, schema, five screens, the Newsprint design
+         language and the map style, plus one seeded trail with real coordinates. Written so Lovable has
          no room to invent a generic travel app.</p>
     </div>
     <div class="meta">
       <b>Words</b>&nbsp; {WORDS}<br>
+      <b>Platform</b>&nbsp; Responsive web, desktop-first<br>
       <b>Stack</b>&nbsp; React · Supabase · MapLibre<br>
       <b>Palette</b>&nbsp; Newsprint / ink red<br>
       <b>Seed</b>&nbsp; 1 trail · 6 stops
