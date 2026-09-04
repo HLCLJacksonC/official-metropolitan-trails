@@ -40,6 +40,18 @@ h1,h2{text-wrap:balance;margin:0}
 .tcard .zh{font-size:11.5px;color:var(--ink3);margin-bottom:5px}
 .tcard .note{font-size:11.5px;line-height:1.45;color:var(--ink2)}
 
+.accents{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:0 0 26px}
+.accents .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3);margin-right:6px}
+.acard{font:inherit;color:inherit;background:var(--card);border:1px solid var(--hair);border-radius:999px;
+  padding:6px 14px 6px 8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:.15s}
+.acard:hover{border-color:var(--ink3)}
+.acard[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.acard .dot{width:16px;height:16px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.14)}
+.acard b{font-size:12.5px;font-weight:500;display:block;line-height:1.25}
+.acard em{font-family:"IBM Plex Mono",monospace;font-style:normal;font-size:10px;color:var(--ink3)}
+.hint{font-size:12.5px;color:var(--ink3);margin-left:4px}
+
 /* ---- the board, themed ---- */
 .board{border:1px solid var(--hair);border-radius:3px;overflow:hidden;overflow-x:auto}
 .cv{background:var(--ground);color:var(--label);font-family:Archivo,var(--cjk),sans-serif;min-width:900px}
@@ -71,6 +83,11 @@ h1,h2{text-wrap:balance;margin:0}
 .cv[data-t="sodium"]{--ground:#14100B;--street:#E3B571;--water:#5A4A32;--water-fill:#1E1810;--water-label:#A8875A;--accent:#6FD8E0;--label:#F2DFBE;--rule:rgba(242,223,190,.3);--grain:.22;--water-punch:#14100B;--op1:.95;--op2:.72;--op3:.46;--other-op:.4}
 .cv[data-t="silt"]{--ground:#191C18;--street:#DAD5C4;--water:#6E6647;--water-fill:#221F16;--water-label:#9A9070;--accent:#E4572E;--label:#E8E3D3;--rule:rgba(232,227,211,.3);--grain:.2;--water-punch:#191C18;--op1:.95;--op2:.72;--op3:.46;--other-op:.38}
 .cv[data-t="newsprint"]{--ground:#EDEAE2;--street:#2E2B27;--water:#6E93A1;--water-fill:#D6E2E6;--water-label:#4B707E;--accent:#C63A22;--label:#22201C;--rule:rgba(34,32,28,.24);--grain:.05;--water-punch:#D9E4E8;--op1:.88;--op2:.5;--op3:.26;--other-op:.6}
+/* accent overrides sit after the palettes so they win on equal specificity */
+.cv[data-a="red"]{--accent:#C63A22}
+.cv[data-a="green"]{--accent:#37703F}
+.cv[data-a="blue"]{--accent:#23478A}
+.cv[data-a="bitumen"]{--accent:#3E2F27}
 
 .cv .topbar{display:flex;align-items:baseline;padding:12px 26px;font-size:14px;font-weight:600;
   letter-spacing:.055em;text-transform:uppercase;border-bottom:1px solid var(--rule)}
@@ -172,6 +189,23 @@ td i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:
       </button>
   </div>
 
+  <div class="accents" role="group" aria-label="Accent">
+    <span class="lbl">Accent</span>
+      <button type="button" class="acard" data-accent="red" aria-pressed="false"
+        title="The native Newsprint value."><span class="dot" style="background:#C63A22"></span>
+        <span><b>Ink red</b><em>#C63A22</em></span></button>
+      <button type="button" class="acard" data-accent="green" aria-pressed="false"
+        title="Quieter; reads as parkland on a light ground."><span class="dot" style="background:#37703F"></span>
+        <span><b>Deep green</b><em>#37703F</em></span></button>
+      <button type="button" class="acard" data-accent="blue" aria-pressed="false"
+        title="Classic printed-map ink — but it fights the water tint."><span class="dot" style="background:#23478A"></span>
+        <span><b>Ink blue</b><em>#23478A</em></span></button>
+      <button type="button" class="acard" data-accent="bitumen" aria-pressed="false"
+        title="Near-black brown, as the Athens sheet draws its route."><span class="dot" style="background:#3E2F27"></span>
+        <span><b>Bitumen</b><em>#3E2F27</em></span></button>
+    <span class="hint" id="ahint"></span>
+  </div>
+
   <div class="board"><div class="cv" id="cv" data-t="newsprint"></div></div>
   <div class="caption">Live re-theme — eight custom properties drive the map, the labels and every piece of chrome.</div>
 
@@ -207,9 +241,17 @@ td i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:
          actually happens under after dark, and is the one to revisit if the project turns toward night
          walking. Silt is the river’s own colour and the oxide red of everything on the route that has stopped
          working — the most site-specific of them, and the strongest dark counter-proposal.</p>
-      <p>If Newsprint stands, the open question is the accent: <strong>ink red</strong> is doing a lot of work
-         here and is the one value that will end up on everything. Worth testing against a deep green and an
-         ink blue before it hardens.</p>
+      <p><strong>On the accent.</strong> Four tested on this ground, and they are not equivalent:</p>
+      <p><strong>Ink red</strong> is the only one that separates from everything else on the sheet — no other
+         element on a printed map is red, so it reads as <em>route</em> with no ambiguity. <strong>Deep green</strong>
+         is quieter and pleasant, but it reads as parkland rather than as a line someone walked.
+         <strong>Ink blue</strong> fails here: next to the river it looks like a tributary, and the eye files
+         it as water. <strong>Bitumen</strong> is the Athens sheet’s own choice and looks right in isolation,
+         but our arterials are near-black too, so the route sinks into the network — that reference works
+         because its basemap is far lighter than ours.</p>
+      <p>So: <strong>ink red, unless you want the map to whisper.</strong> If bitumen is the one you want, it
+         costs a second change — the arterial weight has to drop to a mid-grey to give the route somewhere to
+         stand out from, and that weakens the street hierarchy the light pass just bought.</p>
     </div>
   </section>
 </div>
@@ -298,15 +340,34 @@ document.getElementById('cv').innerHTML = `
 
 const cv = document.getElementById('cv');
 const cards = [...document.querySelectorAll('.tcard')];
+const acards = [...document.querySelectorAll('.acard')];
+const hint = document.getElementById('ahint');
+const NATIVE = {"night": "#9EE86B", "cyanotype": "#F2C14E", "sodium": "#6FD8E0", "silt": "#E4572E", "newsprint": "#C63A22"};
+
+function paintAccents(){
+  const g = getComputedStyle(cv).getPropertyValue('--ground').trim();
+  acards.forEach(a => { a.style.background = g; a.style.color = 'inherit'; });
+}
+function setAccent(id){
+  if (id) cv.dataset.a = id; else delete cv.dataset.a;
+  acards.forEach(a => a.setAttribute('aria-pressed', String(a.dataset.accent === id)));
+  hint.textContent = id ? '' : `Showing ${NATIVE[cv.dataset.t]}, this palette’s own.`;
+  try { id ? localStorage.setItem('mt-accent', id) : localStorage.removeItem('mt-accent'); } catch (e) {}
+}
 function pick(id){
   cv.dataset.t = id;
   cards.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.set === id)));
   try { localStorage.setItem('mt-palette', id); } catch (e) {}
+  setAccent(null);                       // a palette brings its own accent
+  paintAccents();
 }
 cards.forEach(c => c.addEventListener('click', () => pick(c.dataset.set)));
-let saved = null;
-try { saved = localStorage.getItem('mt-palette'); } catch (e) {}
+acards.forEach(a => a.addEventListener('click', () => setAccent(a.dataset.accent)));
+
+let saved = null, savedA = null;
+try { saved = localStorage.getItem('mt-palette'); savedA = localStorage.getItem('mt-accent'); } catch (e) {}
 pick(cards.some(c => c.dataset.set === saved) ? saved : 'newsprint');
+if (acards.some(a => a.dataset.accent === savedA)) setAccent(savedA);
 
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }

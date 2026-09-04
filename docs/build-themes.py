@@ -50,6 +50,17 @@ THEMES = [
 ROLES = [('ground','Ground'), ('street','Street network'), ('water','Water'),
          ('accent','Trail'), ('label','Labels')]
 
+# The accent is the one value that ends up on everything — chips, tags, stop dots,
+# eventually the identity. It is a separate axis from the palette; picking a palette
+# resets to that palette's own.
+ACCENTS = [
+    dict(id='red',   name='Ink red',    hex='#C63A22', note='The native Newsprint value.'),
+    dict(id='green', name='Deep green', hex='#37703F', note='Quieter; reads as parkland on a light ground.'),
+    dict(id='blue',  name='Ink blue',   hex='#23478A', note='Classic printed-map ink — but it fights the water tint.'),
+    dict(id='bitumen', name='Bitumen',  hex='#3E2F27', note='Near-black brown, as the Athens sheet draws its route.'),
+]
+
+accent_css = '\n'.join(f'.cv[data-a="{a["id"]}"]{{--accent:{a["hex"]}}}' for a in ACCENTS)
 theme_css = '\n'.join(
     f'.cv[data-t="{t["id"]}"]{{--ground:{t["ground"]};--street:{t["street"]};--water:{t["water"]};'
     f'--water-fill:{t["waterFill"]};--water-label:{t["waterLabel"]};--accent:{t["accent"]};'
@@ -57,12 +68,17 @@ theme_css = '\n'.join(
     f'--water-punch:{t["waterPunch"]};--op1:{t["op1"]};--op2:{t["op2"]};--op3:{t["op3"]};'
     f'--other-op:{t["otherOp"]}}}' for t in THEMES)
 
+acards = '\n'.join(f'''      <button type="button" class="acard" data-accent="{a['id']}" aria-pressed="false"
+        title="{a['note']}"><span class="dot" style="background:{a['hex']}"></span>
+        <span><b>{a['name']}</b><em>{a['hex'].upper()}</em></span></button>''' for a in ACCENTS)
+
 cards = '\n'.join(f'''      <button type="button" class="tcard" data-set="{t['id']}" aria-pressed="false">
         <span class="sw"><i style="background:{t['ground']}"></i><i style="background:{t['street']}"></i><i style="background:{t['water']}"></i><i style="background:{t['accent']}"></i></span>
         <b>{t['name']}</b><span class="zh">{t['zh']}</span>
         <span class="note">{t['note']}</span>
       </button>''' for t in THEMES)
 
+natives = json.dumps({t['id']: t['accent'].upper() for t in THEMES})
 head = ''.join(f'<th>{t["name"]}</th>' for t in THEMES)
 rows = ''
 for key, lbl in ROLES:
@@ -111,6 +127,18 @@ h1,h2{{text-wrap:balance;margin:0}}
 .tcard .zh{{font-size:11.5px;color:var(--ink3);margin-bottom:5px}}
 .tcard .note{{font-size:11.5px;line-height:1.45;color:var(--ink2)}}
 
+.accents{{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:0 0 26px}}
+.accents .lbl{{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink3);margin-right:6px}}
+.acard{{font:inherit;color:inherit;background:var(--card);border:1px solid var(--hair);border-radius:999px;
+  padding:6px 14px 6px 8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:.15s}}
+.acard:hover{{border-color:var(--ink3)}}
+.acard[aria-pressed="true"]{{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}}
+.acard .dot{{width:16px;height:16px;border-radius:50%;flex:none;border:1px solid rgba(0,0,0,.14)}}
+.acard b{{font-size:12.5px;font-weight:500;display:block;line-height:1.25}}
+.acard em{{font-family:"IBM Plex Mono",monospace;font-style:normal;font-size:10px;color:var(--ink3)}}
+.hint{{font-size:12.5px;color:var(--ink3);margin-left:4px}}
+
 /* ---- the board, themed ---- */
 .board{{border:1px solid var(--hair);border-radius:3px;overflow:hidden;overflow-x:auto}}
 .cv{{background:var(--ground);color:var(--label);font-family:Archivo,var(--cjk),sans-serif;min-width:900px}}
@@ -138,6 +166,8 @@ h1,h2{{text-wrap:balance;margin:0}}
 .cv .grain{{opacity:var(--grain)}}
 /* no colour transitions: thousands of svg nodes, and a half-repainted board reads as a bug */
 {theme_css}
+/* accent overrides sit after the palettes so they win on equal specificity */
+{accent_css}
 
 .cv .topbar{{display:flex;align-items:baseline;padding:12px 26px;font-size:14px;font-weight:600;
   letter-spacing:.055em;text-transform:uppercase;border-bottom:1px solid var(--rule)}}
@@ -215,6 +245,12 @@ td i{{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right
 {cards}
   </div>
 
+  <div class="accents" role="group" aria-label="Accent">
+    <span class="lbl">Accent</span>
+{acards}
+    <span class="hint" id="ahint"></span>
+  </div>
+
   <div class="board"><div class="cv" id="cv" data-t="newsprint"></div></div>
   <div class="caption">Live re-theme — eight custom properties drive the map, the labels and every piece of chrome.</div>
 
@@ -245,9 +281,17 @@ td i{{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right
          actually happens under after dark, and is the one to revisit if the project turns toward night
          walking. Silt is the river’s own colour and the oxide red of everything on the route that has stopped
          working — the most site-specific of them, and the strongest dark counter-proposal.</p>
-      <p>If Newsprint stands, the open question is the accent: <strong>ink red</strong> is doing a lot of work
-         here and is the one value that will end up on everything. Worth testing against a deep green and an
-         ink blue before it hardens.</p>
+      <p><strong>On the accent.</strong> Four tested on this ground, and they are not equivalent:</p>
+      <p><strong>Ink red</strong> is the only one that separates from everything else on the sheet — no other
+         element on a printed map is red, so it reads as <em>route</em> with no ambiguity. <strong>Deep green</strong>
+         is quieter and pleasant, but it reads as parkland rather than as a line someone walked.
+         <strong>Ink blue</strong> fails here: next to the river it looks like a tributary, and the eye files
+         it as water. <strong>Bitumen</strong> is the Athens sheet’s own choice and looks right in isolation,
+         but our arterials are near-black too, so the route sinks into the network — that reference works
+         because its basemap is far lighter than ours.</p>
+      <p>So: <strong>ink red, unless you want the map to whisper.</strong> If bitumen is the one you want, it
+         costs a second change — the arterial weight has to drop to a mid-grey to give the route somewhere to
+         stand out from, and that weakens the street hierarchy the light pass just bought.</p>
     </div>
   </section>
 </div>
@@ -336,15 +380,34 @@ document.getElementById('cv').innerHTML = `
 
 const cv = document.getElementById('cv');
 const cards = [...document.querySelectorAll('.tcard')];
+const acards = [...document.querySelectorAll('.acard')];
+const hint = document.getElementById('ahint');
+const NATIVE = {natives};
+
+function paintAccents(){{
+  const g = getComputedStyle(cv).getPropertyValue('--ground').trim();
+  acards.forEach(a => {{ a.style.background = g; a.style.color = 'inherit'; }});
+}}
+function setAccent(id){{
+  if (id) cv.dataset.a = id; else delete cv.dataset.a;
+  acards.forEach(a => a.setAttribute('aria-pressed', String(a.dataset.accent === id)));
+  hint.textContent = id ? '' : `Showing ${{NATIVE[cv.dataset.t]}}, this palette’s own.`;
+  try {{ id ? localStorage.setItem('mt-accent', id) : localStorage.removeItem('mt-accent'); }} catch (e) {{}}
+}}
 function pick(id){{
   cv.dataset.t = id;
   cards.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.set === id)));
   try {{ localStorage.setItem('mt-palette', id); }} catch (e) {{}}
+  setAccent(null);                       // a palette brings its own accent
+  paintAccents();
 }}
 cards.forEach(c => c.addEventListener('click', () => pick(c.dataset.set)));
-let saved = null;
-try {{ saved = localStorage.getItem('mt-palette'); }} catch (e) {{}}
+acards.forEach(a => a.addEventListener('click', () => setAccent(a.dataset.accent)));
+
+let saved = null, savedA = null;
+try {{ saved = localStorage.getItem('mt-palette'); savedA = localStorage.getItem('mt-accent'); }} catch (e) {{}}
 pick(cards.some(c => c.dataset.set === saved) ? saved : 'newsprint');
+if (acards.some(a => a.dataset.accent === savedA)) setAccent(savedA);
 
 const io = new IntersectionObserver(es => es.forEach(e => {{
   if (e.isIntersecting) {{ e.target.classList.add('in'); io.unobserve(e.target); }}
