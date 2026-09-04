@@ -1,0 +1,194 @@
+Build "Metropolitan Trails — Shanghai", a private research tool for a small group
+(2-4 people) documenting walking routes through Shanghai. It surfaces space and history
+that normal city maps and tourist routes leave out: colonial history, old industrial
+zones, urban villages and migrant communities, and how gender-friendly public space is.
+
+This is NOT a public product. Access is by direct URL and everyone with the link is a
+trusted collaborator. No sign-up, no login, no accounts, no moderation.
+
+=== STACK ===
+React + Vite + TypeScript + Tailwind. Supabase for Postgres and Storage.
+MapLibre GL JS for the map (not Leaflet, not Google Maps).
+
+=== DATA MODEL ===
+Two tables. Keep it loose; optimise for "easy to add an entry", not normalisation.
+
+trails
+  id           uuid primary key default gen_random_uuid()
+  title        text not null            -- bilingual, e.g. "杨树浦路：水厂到电厂 / Yangshupu Road"
+  theme        text not null            -- colonial_history | industrial_zone | urban_village | gender_friendliness | other
+  author       text not null
+  description  text                     -- short framing: why this trail exists
+  created_at   timestamptz default now()
+
+pins
+  id           uuid primary key default gen_random_uuid()
+  trail_id     uuid references trails(id) on delete cascade
+  position     int not null             -- order along the trail, 1-based
+  lat          float8 not null
+  lng          float8 not null
+  title        text not null
+  title_zh     text
+  year         text                     -- e.g. "1883", "1920s"
+  body         text                     -- the observation / reflection
+  tag          text                     -- comfortable | oppressive | safe | inconvenient | nostalgic
+  photo_url    text
+  author       text not null
+  created_at   timestamptz default now()
+
+Supabase Storage bucket "pin-photos", public read, anon insert.
+Enable RLS but allow read and write for the anon role on both tables. The group is
+trusted; do not build permissions.
+
+=== SCREENS ===
+
+1. MAP (home). Full-bleed map. Every trail draws as a route line connecting its pins in
+   order, with numbered circular markers. Theme filter chips along the bottom. Clicking a
+   pin opens the pin detail. A key panel bottom-right lists the trails; the selected one
+   is full strength, the others recede. Beneath the map, a horizontal strip of the
+   selected trail's stops, one column each.
+
+2. PIN DETAIL. A panel over the map, bottom-left on desktop and a bottom sheet on mobile.
+   Shows photo, title, Chinese title, year, body text, feeling tag, author, and distance
+   along the trail.
+
+3. TRAIL NARRATIVE at /trail/:id. A scrollable, numbered, top-to-bottom reading of one
+   trail: photo and text per stop, in order. Header carries title, theme, author,
+   description, total distance and stop count. This is the "read the trail as a story"
+   mode and is separate from the free-roam map.
+
+4. ADD TRAIL. Form: title, theme (select), author, description.
+
+5. ADD PIN. Form: choose an existing trail, place the location by clicking the map (also
+   allow pasting "lat, lng"), then title, Chinese title, year, body, feeling tag, photo
+   upload, author. It must work whether or not you created the trail — one person walks
+   and annotates someone else's route.
+
+6. THEME FILTERING on the map via the chips, and the same chips filter the trail list.
+
+=== DESIGN LANGUAGE: "NEWSPRINT" ===
+Chosen from a five-palette study. It is a PRINTED MAP look — a research instrument, not a
+travel app, and not a dark dashboard.
+
+Tokens:
+  --ground      #EDEAE2   page and map background (warm paper)
+  --ink         #22201C   primary text and map labels
+  --street      #2E2B27   road linework
+  --water       #6E93A1   water edge and hydronym labels
+  --water-fill  #D9E4E8   water body fill
+  --accent      #C63A22   INK RED - trails, active chips, tags, stop numbers
+  --rule        rgba(34,32,28,0.24)   hairlines
+
+Ink red is the identity colour and the single accent. Nothing else on a printed map is
+red, so it reads as "route" with no ambiguity. Do NOT substitute green (reads as
+parkland), blue (reads as water), or near-black (sinks into the road network). These were
+tested and rejected.
+
+Type: Archivo for everything structural (700/800 weights; use the condensed widths for
+small uppercase labels) and IBM Plex Mono for data - coordinates, distances, dates,
+eyebrow lines. Both from Google Fonts. Small labels are uppercase with ~0.12em letter
+spacing. Use tabular numerals wherever figures align in columns.
+
+Rules:
+  - Square corners everywhere. No rounded cards, no drop shadows, no gradients, no glass.
+  - Hairline rules, not heavy borders. Let spacing do the separating.
+  - Bilingual throughout: place names carry 中文 and English together; feeling tags show
+    both, e.g. "不便 INCONVENIENT".
+  - Numbering encodes real stop order, so use it. Do not add decorative 01/02/03 markers
+    anywhere else.
+  - Documentary and slightly austere in tone. No friendly illustration, no pastel, no
+    emoji, no rounded playfulness.
+
+=== MAP STYLE (this part matters most) ===
+MapLibre GL JS with OpenFreeMap vector tiles - https://tiles.openfreemap.org/planet -
+which needs no API key. Write a CUSTOM style; do not use an off-the-shelf basemap.
+Centre 31.265, 121.52 (Yangpu, Shanghai) at zoom 12.5.
+
+  - Background: #EDEAE2.
+  - Water: filled #D9E4E8 with a #6E93A1 hairline edge. Water is a printed TINT, never a
+    hole. This is the single most important rule for making it read as printed.
+  - Roads, by class, with minor roads dropped right back so the arterials carry the
+    structure:
+      motorway / trunk / primary   #2E2B27, opacity 0.88, width 2.3 at z12
+      secondary / tertiary         #2E2B27, opacity 0.50, width 1.15
+      residential / service        #2E2B27, opacity 0.26, width 0.62
+  - Rounded line caps and joins.
+  - Turn OFF: road casings, building fills, POI icons, green landuse, street name labels.
+    The map is line-work only.
+  - Labels: settlement and district names only. Uppercase, ~0.12em letter spacing, #22201C
+    at 78% opacity, with a #EDEAE2 halo 2px.
+
+Components:
+  - TOP BAR: "03. SHANGHAI — 杨树浦路 YANGSHUPU ROAD — Y. ZHOU & K. LIN". Trail number in
+    ink red 800 weight, the rest in ink, uppercase and letter-spaced, hairline rule under.
+  - ROUTE LINE: 5px ink red, round caps, with an 11px --ground halo beneath so it stays
+    legible crossing the road network.
+  - PIN MARKERS: 8.5px ink red circles with a 2.4px --ground stroke and the stop number
+    inside in paper colour, Archivo 800, 10.5px.
+  - FRICTION MARKS: an ✗ drawn in --ink with a --ground halo, placed where the route is
+    obstructed — a forced detour, a locked gate, a fence. This is a first-class device,
+    not decoration: the project is about what the city stops you doing, and this is the
+    only way the map can say it. Add an "obstruction" boolean to pins to drive it.
+  - PIN CARD: --ground background, 1px --rule border, square corners. Eyebrow line in ink
+    red mono uppercase ("STOP 02 · 1.9 KM · Y. ZHOU · 19.08.26"), then the English title,
+    then Chinese title · year at 60% opacity, then body, then the feeling tag as a SOLID
+    ink red chip with paper text.
+  - THEME CHIPS: pills, 1px --rule border, uppercase Archivo condensed 10.5px, 0.1em
+    letter spacing. Active chip is solid ink red with paper text.
+  - STOP STRIP: a row beneath the map, one column per stop, divided by hairlines. Each
+    column: "01 · 0.0 KM" in ink red mono, title, Chinese · year at 52%, a one-line blurb,
+    then the feeling tag as an outlined pill.
+  - KEY PANEL: bottom-right of the map. --ground background, --rule border. One row per
+    trail: name, then a short colour bar. Selected trail at full opacity, others at 58%.
+
+=== SEED DATA ===
+Seed one real trail so the app is never empty.
+
+Trail: "杨树浦路：水厂到电厂 / Yangshupu Road: Waterworks to Powerhouse"
+  theme industrial_zone, author "Y. Zhou & K. Lin", 6.8 km, 6 stops.
+  description: "Six and a half kilometres of the East Bund, where Shanghai's first
+  waterworks, first power station and first shipyard now sit inside one continuous public
+  promenade completed in 2019. The route asks a single question at every stop: what does
+  the promenade let you approach, and what does it walk you past?"
+
+  1. Qinhuangdao Rd Wharf / 秦皇岛路码头 / 1930s / 31.25285, 121.50701 / 0.0 km /
+     comfortable — "The ferry still runs every twelve minutes and costs two yuan. On the
+     deck nobody looks at the skyline; they look at their phones, or at the water. This
+     pier is the only place on the whole route where you can stand at the river's edge
+     with nothing between you and it."
+
+  2. Yangshupu Waterworks / 杨树浦水厂 / 1883 / 31.26121, 121.52520 / 1.9 km /
+     inconvenient / OBSTRUCTION — "The waterworks has drawn from the Huangpu since 1883
+     and it is still working, so the promenade cannot cross it. Instead you are lifted
+     onto a 550-metre steel walkway hung out over the water, which puts a fence and eight
+     metres of air between you and the castellated brick you came to look at. You pass the
+     building without ever being beside it."
+
+  3. Cotton & Hemp Warehouse / 毛麻仓库 / 1920 / 31.26533, 121.53120 / 3.3 km / safe —
+     "New paving, new lighting, a security guard at each end and no shade anywhere. At
+     three in the afternoon this is the safest and least occupied stretch of the entire
+     route: twelve people in twenty minutes, nine of them walking through, none of them
+     sitting down."
+
+  4. Power Plant Ash Silo / 杨树浦发电厂灰仓 / 1913 / 31.27457, 121.54699 / 4.9 km /
+     oppressive — "Coal ash was stored here for eighty years. The concrete cylinders are
+     an art space now, with a café on the roof; the walls were never painted and still
+     smell of cement dust when it rains. Inside the silo your own footsteps come back at
+     you about half a second late."
+
+  5. Dinghaiqiao / 定海桥 / 1920s- / 31.27909, 121.55400 / 5.7 km / nostalgic — "Two
+     blocks inland the promenade's vocabulary stops. Shops face the street, laundry
+     crosses the lane, the ground floor is doing five jobs at once. This is where the
+     people who serviced the mills lived, and it is the only place on the route where
+     anyone asked us what we were doing."
+
+  6. Fuxing Island / 复兴岛 / 1920s / 31.28544, 121.56199 / 6.8 km / oppressive /
+     OBSTRUCTION — "The island is state land and mostly closed. The gate stands open, but
+     there is a guard post beside it and a sign listing what may not be photographed. We
+     walked eight hundred metres in and found nowhere to sit down."
+
+=== DO NOT BUILD ===
+Comments or replies. Real-time sync (people refresh). Login, accounts, or roles.
+Moderation. Notifications. Search. Dark mode. Onboarding or tours. A marketing or landing
+page. Analytics. Offline or mobile capture. Leave room in the schema for comments later,
+but build no UI for them.
